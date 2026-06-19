@@ -1,0 +1,759 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Tezo Quality Engineering · Don't let quality slow down your business speed</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --primary:   #e54a59;
+    --secondary: #4e3aad;
+    --accent:    #b0a8fe;
+    --bg:        #0d0d12;
+    --bg-2:      #13131a;
+    --surface:   #1a1a28;
+    --border:    rgba(176,168,254,0.12);
+    --text:      #ffffff;
+    --text-soft: rgba(255,255,255,0.7);
+    --text-muted:rgba(255,255,255,0.42);
+    --solve-bg:  #9cb1e6;
+    --solve-card:#ABC0F3;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-behavior: smooth; }
+
+  body {
+    font-family: 'Inter', -apple-system, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    line-height: 1.55;
+    font-size: 16px;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  .container { max-width: 1200px; margin: 0 auto; padding: 0 36px; }
+  .mono { font-family: 'Inter', monospace; letter-spacing: 0.04em; font-size: 0.85em; }
+
+  .ic { width: 22px; height: 22px; stroke-width: 1.75; fill: none; stroke: currentColor; stroke-linecap: round; stroke-linejoin: round; }
+  .chip {
+    width: 46px; height: 46px; border-radius: 12px;
+    display: inline-flex; align-items: center; justify-content: center;
+    margin-bottom: 18px;
+  }
+  .chip.amber  { background: rgba(255,255,255,0.15); color: var(--primary); }
+  .chip.persona { background: var(--accent); color: var(--secondary); transition: background 0.4s, color 0.4s; }
+
+  /* Header */
+  header {
+    border-bottom: 1px solid var(--border);
+    padding: 18px 0;
+    position: sticky; top: 0; z-index: 50;
+    background: rgba(13,13,18,0.92);
+    backdrop-filter: blur(12px);
+  }
+  .nav { display: flex; align-items: center; justify-content: space-between; gap: 32px; }
+  .logo-img { height: 36px; width: auto; display: block; }
+  .logo-fallback {
+    font-family: 'Inter', sans-serif;
+    font-weight: 700; font-size: 20px; letter-spacing: -0.02em; color: var(--text);
+  }
+  .logo-fallback .accent { color: var(--primary); }
+  .nav-meta { font-size: 11px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.14em; }
+  .nav-cta {
+    background: var(--primary); color: #fff;
+    padding: 10px 20px; border-radius: 6px;
+    font-size: 13px; font-weight: 600; text-decoration: none;
+    transition: filter 0.2s, transform 0.15s;
+  }
+  .nav-cta:hover { filter: brightness(1.1); transform: translateY(-1px); }
+
+  /* Role bar */
+  .role-bar { padding: 48px 0 8px; }
+  .role-label {
+    font-size: 11px; letter-spacing: 0.16em; text-transform: uppercase;
+    color: var(--text-muted); margin-bottom: 14px;
+    display: inline-flex; align-items: center; gap: 8px;
+  }
+  .role-label::before { content:""; width:6px; height:6px; border-radius:50%; background: var(--primary); }
+  .role-pills { display: flex; gap: 8px; flex-wrap: wrap; }
+  .role-pill {
+    border: 1px solid var(--border); background: transparent;
+    padding: 11px 20px; border-radius: 999px; cursor: pointer;
+    font-family: 'Inter', sans-serif; font-size: 15px; font-weight: 500;
+    color: var(--text-muted); transition: all 0.25s;
+  }
+  .role-pill:hover { color: var(--text); border-color: rgba(176,168,254,0.4); }
+  .role-pill.active { background: var(--primary); color: #fff; border-color: var(--primary); }
+
+  /* Hero */
+  .hero { padding: 28px 0 80px; }
+  .hero-grid { display: grid; grid-template-columns: 1.35fr 1fr; gap: 64px; align-items: start; }
+  .eyebrow { font-size: 11px; letter-spacing: 0.16em; text-transform: uppercase; color: var(--primary); margin-bottom: 24px; }
+  h1 {
+    font-family: 'Inter', sans-serif; font-size: clamp(38px, 5vw, 64px);
+    line-height: 1.04; letter-spacing: -0.035em; font-weight: 700; margin-bottom: 26px;
+  }
+  h1 .accent { color: var(--primary); }
+  .lede { font-size: 18px; color: var(--text-soft); line-height: 1.6; max-width: 600px; }
+  .lede strong { color: var(--text); font-weight: 600; }
+  .secondary-link {
+    display: inline-block; margin-top: 22px; color: var(--accent); text-decoration: none;
+    font-size: 14px; border-bottom: 1px solid rgba(176,168,254,0.35); padding-bottom: 2px; transition: border-color 0.2s;
+  }
+  .secondary-link:hover { border-color: var(--accent); }
+
+  /* Offer card */
+  .offer-card {
+    background: var(--secondary); color: #fff;
+    padding: 28px; border-radius: 14px; position: relative; overflow: hidden;
+    border: 1px solid rgba(176,168,254,0.2);
+  }
+  .offer-card::before { content:""; position:absolute; top:0; left:0; right:0; height:3px; background: var(--primary); }
+  .offer-card .tag { font-size: 11px; color: var(--accent); letter-spacing: 0.14em; text-transform: uppercase; margin-bottom: 16px; }
+  .offer-card .name { font-size: 26px; font-weight: 700; letter-spacing: -0.025em; margin-bottom: 6px; line-height: 1.15; color: #fff; }
+  .offer-card .frame { color: rgba(176,168,254,0.75); font-size: 13px; margin-bottom: 24px; line-height: 1.5; }
+  .specs { border-top: 1px solid rgba(176,168,254,0.2); padding-top: 16px; }
+  .specs .row { display:flex; justify-content:space-between; padding:9px 0; font-size:13px; }
+  .specs .k { color: var(--accent); font-size: 11px; letter-spacing: 0.08em; text-transform: uppercase; opacity: 0.75; }
+  .specs .v { font-weight: 500; color: #fff; }
+  .specs .v.price { font-size: 20px; font-weight: 700; letter-spacing: -0.02em; }
+  .card-cta {
+    display: flex; align-items: center; justify-content: space-between;
+    background: var(--primary); color: #fff;
+    padding: 14px 18px; border-radius: 8px; text-decoration: none; margin-top: 18px;
+    font-weight: 600; font-size: 14px; transition: filter 0.2s;
+  }
+  .card-cta:hover { filter: brightness(1.1); }
+  .card-cta .arrow { transition: transform 0.2s; }
+  .card-cta:hover .arrow { transform: translateX(3px); }
+
+  /* Positioning band */
+  .position { background: var(--secondary); color: #fff; padding: 96px 0; }
+  .position .section-eyebrow { color: var(--accent); }
+  .position .thesis {
+    font-size: clamp(28px, 3.8vw, 44px); line-height: 1.2; font-weight: 400;
+    letter-spacing: -0.015em; max-width: 880px; margin: 18px 0 40px; color: #fff;
+  }
+  .position .thesis em { font-style: italic; color: var(--accent); }
+  .pos-points { display:grid; grid-template-columns:repeat(3,1fr); gap:1px; background: rgba(176,168,254,0.15); border:1px solid rgba(176,168,254,0.15); border-radius:12px; overflow:hidden; }
+  .pos-point { background: rgba(78,58,173,0.6); padding: 28px 26px; }
+  .pos-point .n { font-size:11px; color:var(--accent); letter-spacing:0.14em; margin-bottom:14px; }
+  .pos-point h3 { font-size:18px; font-weight:600; margin-bottom:8px; letter-spacing:-0.015em; color:#fff; }
+  .pos-point p { font-size:14px; color:rgba(176,168,254,0.8); line-height:1.6; }
+  .pos-close { font-style: italic; font-size: clamp(22px, 2.8vw, 32px); color: var(--accent); margin-top: 12px; letter-spacing: -0.01em; }
+
+  /* Slowdown */
+  .slowdown { padding: 96px 0; background: var(--bg); }
+  .slowdown-head { max-width: 720px; margin-bottom: 48px; }
+  .slowdown-head h2 { font-size: clamp(28px, 3.4vw, 38px); letter-spacing: -0.03em; font-weight: 600; line-height: 1.1; margin-bottom: 14px; color: var(--text); }
+  .slowdown-head p { color: var(--text-muted); font-size: 16px; line-height: 1.6; }
+  .slow-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:6px; }
+  .slow-cell { background: var(--secondary); border: 1px solid rgba(176,168,254,0.18); border-radius: 12px; padding: 30px 28px; position: relative; }
+  .slow-cell .n { font-size:12px; color:var(--accent); margin-bottom:16px; letter-spacing:0.06em; }
+  .slow-cell h3 { font-size:19px; font-weight:600; margin-bottom:10px; letter-spacing:-0.015em; line-height:1.2; color:#fff; }
+  .slow-cell p { font-size:14px; color:rgba(176,168,254,0.8); line-height:1.6; }
+  .slow-cell .stat { margin-top:16px; display:inline-block; font-size:11px; color:var(--accent); letter-spacing:0.06em; border-top:1px solid rgba(176,168,254,0.2); padding-top:12px; width:100%; }
+
+  /* Stats strip */
+  .stats { border-top: 1px solid var(--border); border-bottom: 1px solid var(--border); padding: 40px 0; display: grid; grid-template-columns: repeat(3,1fr); gap: 56px; }
+  .stat-num { font-size: 42px; letter-spacing: -0.03em; font-weight: 700; color: var(--text); margin-bottom: 8px; line-height: 1; }
+  .stat-num .accent { color: #ffffff; }
+  .stat-label { font-size: 13px; color: var(--text-muted); line-height: 1.5; max-width: 280px; }
+
+  /* Proof */
+  .proof { padding: 88px 0; background: var(--bg); }
+  .proof-grid { display:grid; grid-template-columns:0.42fr 0.58fr; gap:56px; align-items:start; }
+  .section-eyebrow { font-size: 11px; letter-spacing: 0.16em; text-transform: uppercase; color: var(--text-muted); margin-bottom: 14px; }
+  .proof-title { font-size:30px; letter-spacing:-0.025em; font-weight:600; line-height:1.15; color:var(--text); }
+  .proof-body { font-size:16px; color:var(--text-soft); line-height:1.6; margin-bottom:24px; }
+  .proof-body strong { color:var(--text); font-weight:600; }
+  .proof-metrics { display:grid; grid-template-columns:repeat(3,1fr); gap:1px; background: rgba(176,168,254,0.12); border:1px solid rgba(176,168,254,0.12); border-radius:10px; overflow:hidden; }
+  .proof-metric { background: var(--secondary); padding: 18px; }
+  .proof-metric .v { font-size:22px; font-weight:700; color:#fff; letter-spacing:-0.02em; line-height:1; margin-bottom:6px; }
+  .proof-metric .l { font-size:10px; color:var(--accent); text-transform:uppercase; letter-spacing:0.12em; opacity:0.8; }
+  .testimonial { margin-top:32px; border-left:3px solid var(--primary); padding:4px 0 4px 24px; }
+  .testimonial .quote { font-size:20px; line-height:1.45; font-style:italic; color:var(--text); }
+  .testimonial .attr { margin-top:14px; font-size:12px; color:var(--text-muted); letter-spacing:0.06em; }
+  .repnote { margin-top:10px; font-size:11px; color:var(--text-muted); font-style:italic; }
+  .figures-note { margin-top:22px; font-size:12px; color:var(--text-muted); line-height:1.5; max-width:760px; }
+
+  /* Timeline (how we solve it) — #9cb1e6 bg */
+  .timeline-section { padding: 96px 0; background: var(--solve-bg); border-top: 1px solid rgba(0,0,0,0.1); border-bottom: 1px solid rgba(0,0,0,0.1); }
+  .timeline-section .section-eyebrow { color: #2a3a6e; }
+  .timeline-head { display:grid; grid-template-columns:1.2fr 1fr; gap:56px; margin-bottom:56px; align-items:end; }
+  .timeline-head h2 { font-size: clamp(28px,3.4vw,38px); letter-spacing:-0.03em; font-weight:600; line-height:1.1; max-width:560px; color:#0d1a3a; }
+  .timeline-head .note { font-size:15px; color:#2a3a6e; line-height:1.55; border-left:2px solid var(--secondary); padding-left:16px; }
+  .timeline-head .note .lens { font-size:11px; letter-spacing:0.14em; text-transform:uppercase; color: var(--secondary); margin-bottom:6px; display:block; font-weight:600; }
+  .timeline { position:relative; }
+  .timeline::before { content:""; position:absolute; left:120px; top:14px; bottom:14px; width:1px; background: rgba(78,58,173,0.3); }
+  .day { display:grid; grid-template-columns:112px 1fr; gap:48px; padding:24px 0; position:relative; border-bottom:1px solid rgba(78,58,173,0.15); }
+  .day:last-child { border-bottom:none; }
+  .day-marker { text-align:right; font-size:12px; font-weight:600; color:#2a3a6e; position:relative; padding-top:3px; padding-right: 10px;}
+  .day-marker::after { content:""; position:absolute; right:-13px; top:6px; width:8px; height:8px; background:var(--secondary); border-radius:50%; border:2px solid var(--solve-bg); box-shadow:0 0 0 1px var(--secondary); }
+  .day-content h3 { font-size:18px; font-weight:600; margin-bottom:6px; letter-spacing:-0.015em; color:#0d1a3a; }
+  .day-content p { color:#2a3a6e; font-size:15px; line-height:1.55; max-width:640px; }
+  .day-content .deliv { font-size:11px; color:var(--secondary); margin-top:8px; display:inline-block; letter-spacing:0.06em; font-weight:600; }
+
+  /* Deliverables — also #9cb1e6 bg, cards #ABC0F3 */
+  .deliverables { padding: 84px 0; background: var(--solve-bg); border-top: 1px solid rgba(0,0,0,0.08); border-bottom: 1px solid rgba(0,0,0,0.08); }
+  .deliverables-head { max-width:720px; margin-bottom:40px; }
+  .deliverables-head .section-eyebrow { color:#2a3a6e; }
+  .deliverables-head h2 { font-size:clamp(28px,3.4vw,38px); letter-spacing:-0.03em; font-weight:600; line-height:1.12; color:#0d1a3a; }
+  .deliv-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:6px; }
+  .deliv-cell { background: var(--solve-card); border:1px solid rgba(78,58,173,0.15); border-radius:12px; padding:28px 26px; }
+  .deliv-cell .num { font-size:12px; color:var(--secondary); margin-bottom:14px; font-weight:600; }
+  .deliv-cell h3 { font-size:18px; font-weight:600; margin-bottom:10px; letter-spacing:-0.015em; color:#0d1a3a; }
+  .deliv-cell p { font-size:14px; color:#2a3a6e; line-height:1.6; }
+
+  /* Ladder */
+  .ladder-section { padding: 88px 0; background: var(--bg); }
+  .ladder-head { margin-bottom:44px; max-width:720px; }
+  .ladder-head .section-eyebrow { color: var(--text-muted); }
+  .ladder-head h2 { font-size:30px; letter-spacing:-0.025em; font-weight:600; line-height:1.15; margin-bottom:12px; color:var(--text); }
+  .ladder-head p { color:var(--text-muted); font-size:15px; line-height:1.6; }
+  .ladder { display:grid; grid-template-columns:repeat(4,1fr); gap:6px; }
+  .step { background: var(--surface); border:1px solid var(--border); padding:24px 22px; border-radius:10px; position:relative; }
+  .step.featured { background: var(--secondary); color:#fff; border-color:var(--secondary); }
+  .step.featured .step-label { color:var(--accent); }
+  .step.featured .step-desc { color:rgba(176,168,254,0.75); }
+  .step.featured::before { content:"you start here"; position:absolute; top:-10px; right:16px; background: var(--primary); color:#fff; padding:3px 10px; font-size:10px; border-radius:999px; letter-spacing:0.08em; text-transform:uppercase; font-weight:600; }
+  .step-num { font-size:12px; color:var(--primary); margin-bottom:14px; font-weight:600; }
+  .step.featured .step-num { color:var(--accent); }
+  .step-label { font-size:10px; color:var(--text-muted); text-transform:uppercase; letter-spacing:0.14em; margin-bottom:10px; }
+  .step-title { font-size:18px; font-weight:600; margin-bottom:10px; letter-spacing:-0.015em; color:var(--text); }
+  .step.featured .step-title { color:#fff; }
+  .step-desc { font-size:13px; color:var(--text-muted); line-height:1.5; }
+
+  /* Who we are — secondary bg */
+  .who { padding: 96px 0; background: var(--secondary); border-top:1px solid rgba(176,168,254,0.15); }
+  .who .section-eyebrow { color:var(--accent); opacity:0.85; }
+  .who-lead { font-size: clamp(26px,3.4vw,40px); line-height:1.2; font-weight:400; letter-spacing:-0.015em; max-width:760px; margin:16px 0 52px; color:#fff; }
+  .who-lead em { font-style:italic; color:var(--accent); }
+  .who-stats { display:grid; grid-template-columns:repeat(3,1fr); gap:6px; margin-bottom:56px; border-top:1px solid rgba(176,168,254,0.2); border-bottom:1px solid rgba(176,168,254,0.2); }
+  .who-stat { padding:28px 4px 28px 0; }
+  .who-stat .v { font-size:44px; font-weight:700; letter-spacing:-0.03em; color:#ffffff; line-height:1; margin-bottom:10px; }
+  .who-stat .l { font-size:13px; color:rgba(176,168,254,0.7); line-height:1.5; max-width:240px; }
+  .who-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:48px; }
+  .who-item .chip.persona { background:var(--accent); color:var(--secondary); }
+  .who-item .n { font-size:11px; color:var(--accent); letter-spacing:0.14em; margin-bottom:14px; font-weight:600; }
+  .who-item h3 { font-size:18px; font-weight:600; margin-bottom:10px; letter-spacing:-0.015em; color:#fff; }
+  .who-item p { font-size:14px; color:rgba(176,168,254,0.75); line-height:1.6; }
+
+  /* AI capability */
+  .capability { padding: 84px 0; background:var(--bg); border-top:1px solid var(--border); }
+  .capability-head { max-width:720px; margin-bottom:44px; }
+  .capability-head h2 { font-size:clamp(26px,3.2vw,36px); letter-spacing:-0.03em; font-weight:600; line-height:1.12; margin-bottom:12px; color:var(--text); }
+  .capability-head p { color:var(--text-muted); font-size:16px; line-height:1.6; }
+  .cap-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:28px; }
+  .cap-item h3 { font-size:18px; font-weight:600; margin-bottom:8px; letter-spacing:-0.015em; color:var(--text); }
+  .cap-item p { font-size:14px; color:var(--text-soft); line-height:1.6; }
+  .cap-item .where { margin-top:12px; font-size:11px; color:var(--primary); letter-spacing:0.04em; font-weight:500; }
+
+  /* Insights */
+  .insights { padding: 88px 0; background:var(--bg); border-top:1px solid var(--border); }
+  .insights-head { margin-bottom:40px; max-width:720px; }
+  .insights-head h2 { font-size:clamp(26px,3.2vw,36px); letter-spacing:-0.03em; font-weight:600; line-height:1.12; margin-bottom:12px; color:var(--text); }
+  .insights-head p { color:var(--text-muted); font-size:16px; line-height:1.6; }
+  .insight-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:6px; }
+  .insight-card { background: var(--secondary); border:1px solid rgba(176,168,254,0.2); border-radius:12px; padding:28px 26px; display:flex; flex-direction:column; }
+  .insight-tag { font-size:11px; color:var(--accent); letter-spacing:0.12em; text-transform:uppercase; margin-bottom:16px; font-weight:500; }
+  .insight-card h3 { font-size:19px; font-weight:600; margin-bottom:10px; letter-spacing:-0.015em; line-height:1.2; color:#fff; }
+  .insight-card p { font-size:14px; color:rgba(176,168,254,0.75); line-height:1.6; flex:1; }
+  .insight-foot { margin-top:20px; }
+  .insight-link { font-size:14px; font-weight:500; color:var(--accent); text-decoration:none; display:inline-flex; align-items:center; gap:8px; border-bottom:1px solid rgba(176,168,254,0.35); padding-bottom:2px; transition:border-color 0.2s; }
+  .insight-link:hover { border-color:var(--accent); }
+  .insight-link .arrow { transition:transform 0.2s; }
+  .insight-link:hover .arrow { transform:translateX(3px); }
+  .insight-soon { font-size:11px; color:var(--text-muted); letter-spacing:0.1em; text-transform:uppercase; display:inline-flex; align-items:center; gap:8px; }
+  .insight-soon::before { content:""; width:7px; height:7px; border-radius:50%; background:var(--primary); }
+
+  /* Final CTA */
+  .final { padding: 110px 0; text-align:center; background:var(--bg); }
+  .final .tag { font-size:12px; color:var(--primary); letter-spacing:0.14em; text-transform:uppercase; margin-bottom:18px; }
+  .final h2 { font-size:clamp(34px,4.2vw,54px); letter-spacing:-0.035em; line-height:1.06; font-weight:700; margin:0 auto 20px; max-width:780px; color:var(--text); }
+  .final p { font-size:17px; color:var(--text-muted); max-width:560px; margin:0 auto 32px; }
+  .final-cta { background: var(--primary); color:#fff; padding:16px 32px; border-radius:8px; text-decoration:none; font-weight:600; font-size:15px; display:inline-flex; align-items:center; gap:10px; transition:filter 0.2s, transform 0.15s; }
+  .final-cta:hover { filter:brightness(1.1); transform:translateY(-1px); }
+  .final-cta .arrow { transition:transform 0.2s; }
+  .final-cta:hover .arrow { transform:translateX(3px); }
+
+  footer { border-top:1px solid var(--border); padding:28px 0; font-size:13px; color:var(--text-muted); background:var(--bg); }
+  .foot { display:flex; justify-content:space-between; align-items:center; gap:16px; flex-wrap:wrap; }
+  .foot a { color:var(--text-muted); text-decoration:none; margin-left:22px; transition:color 0.2s; }
+  .foot a:hover { color:var(--text); }
+
+  .swap { transition: opacity 0.32s ease, transform 0.32s ease; }
+  .swap.out { opacity:0; transform:translateY(6px); }
+
+  @media (prefers-reduced-motion: reduce) { * { transition:none !important; scroll-behavior:auto; } }
+  @media (max-width: 920px) {
+    .hero-grid,.stats,.proof-grid,.timeline-head,.who-grid,.ladder,.pos-points,.slow-grid,.who-stats,.cap-grid,.deliv-grid,.insight-grid { grid-template-columns:1fr; gap:24px; }
+    h1 { font-size:38px; }
+    .nav-meta { display:none; }
+    .timeline::before { left:56px; }
+    .day { grid-template-columns:52px 1fr; gap:22px; }
+    .ladder { gap:10px; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="container nav">
+    <div class="logo">
+  <img src="logow.png" alt="Tezo" class="logo-img">
+</div>
+    <div class="nav-meta mono">A small Quality Engineering practice</div>
+    <a href="#book" class="nav-cta">Book a call</a>
+  </div>
+</header>
+
+<section class="role-bar">
+  <div class="container">
+    <div class="role-label">Show me this for</div>
+    <div class="role-pills">
+      <button class="role-pill active" data-role="eng">Engineering</button>
+      <button class="role-pill" data-role="qa">Quality</button>
+      <button class="role-pill" data-role="cio">Technology</button>
+    </div>
+  </div>
+</section>
+
+<section class="hero">
+  <div class="container hero-grid">
+    <div>
+      <div class="eyebrow swap" data-key="eyebrow">For VPs of Engineering / CTOs</div>
+      <h1>Don't let quality <span class="accent">slow down</span> your business speed.</h1>
+      <p class="lede swap" data-key="lede">Your teams ship faster than they ever have. Quality is now the thing that decides whether that speed reaches customers or stalls right before it does. We run a two to three week assessment, then embed AI-augmented QE pods that <strong>turn quality from the bottleneck into the accelerator,</strong> without growing your headcount.</p>
+      <a href="#solve" class="secondary-link">See how the assessment works &rarr;</a>
+    </div>
+    <aside class="offer-card">
+      <div class="tag swap" data-key="card-tag">Start here</div>
+      <div class="name swap" data-key="card-name">The Velocity Audit</div>
+      <div class="frame swap" data-key="card-frame">A two to three week QE assessment framed in DORA metrics. Same engagement, tuned to engineering leadership.</div>
+      <div class="specs">
+        <div class="row"><span class="k">Duration</span><span class="v">2 to 3 weeks</span></div>
+        <div class="row"><span class="k">Team</span><span class="v">2 senior engineers</span></div>
+        <div class="row"><span class="k">Output</span><span class="v">Audit + roadmap</span></div>
+        <div class="row"><span class="k">Price</span><span class="v price">From $15,000</span></div>
+      </div>
+      <a href="#book" class="card-cta">
+        <span class="swap" data-key="card-cta">Book a scoping call</span>
+        <span class="arrow">&rarr;</span>
+      </a>
+    </aside>
+  </div>
+</section>
+
+<section class="position" id="why">
+  <div class="container">
+    <div class="section-eyebrow">What we solve</div>
+    <p class="thesis">The problem is not that your people test too little. It is that in an AI-accelerated world, <em>quality has quietly become the new bottleneck.</em></p>
+    <p class="pos-close">We unlock quality speed.</p>
+  </div>
+</section>
+
+<section class="slowdown">
+  <div class="container">
+    <div class="slowdown-head">
+      <div class="section-eyebrow">The real causes</div>
+      <h2>In what ways is QE actually slowing you down?</h2>
+      <p>Three patterns show up in almost every assessment we run. None of them are fixed by adding more testers.</p>
+    </div>
+    <div class="slow-grid">
+      <div class="slow-cell">
+        <div class="chip amber"><img src="icon1.png" style="width:22px;height:22px;object-fit:contain;"></div>        <div class="n mono">/ 01</div>
+        <h3>AI coding outpaced the safety net</h3>
+        <p>Developers now ship far more code with assistants, but QA capacity stayed flat. Review and regression became the line everything queues behind, so the speed you gained upstream is lost at the gate.</p>
+        <span class="stat mono">30 to 50% more code, same QA capacity</span>
+      </div>
+      <div class="slow-cell">
+        <div class="chip amber"><img src="icon2.png" style="width:22px;height:22px;object-fit:contain;"></div>        <div class="n mono">/ 02</div>
+        <h3>Broken automation that still depends on too many people</h3>
+        <p>Brittle scripts break on every UI change. Teams burn most of their automation effort keeping the suite alive instead of growing coverage. It takes a crowd to run what should run itself.</p>
+        <span class="stat mono">35 to 45% of automation time on maintenance</span>
+      </div>
+      <div class="slow-cell">
+        <div class="chip amber"><img src="icon3.png" style="width:22px;height:22px;object-fit:contain;"></div>        <div class="n mono">/ 03</div>
+        <h3>No CI/CD-native testing, no shift-left</h3>
+        <p>Quality sits at the end of the pipeline instead of inside it. Defects surface late, at the most expensive moment to fix, because testing was never wired into the build and the team never moved left.</p>
+        <span class="stat mono">Defects found late cost the most to fix</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="capability">
+  <div class="container">
+    <div class="capability-head">
+      <div class="section-eyebrow">What "AI-augmented" actually means</div>
+      <h2>The augmentation is specific, not a slogan.</h2>
+      <p>We apply AI in the three places it measurably compresses QE work. Everywhere else, experienced engineers still make the call.</p>
+    </div>
+    <div class="cap-grid">
+      <div class="cap-item">
+        <div class="chip persona"><svg viewBox="0 0 24 24" class="ic"><path d="M14 4.1 12 6"/><path d="m5.1 8-2.9-.8"/><path d="m6 12-1.9 2"/><path d="M7.2 2.2 8 5.1"/><path d="M9.037 9.69a.498.498 0 0 1 .653-.653l11 4.5a.5.5 0 0 1-.074.949l-4.349 1.041a1 1 0 0 0-.74.739l-1.04 4.35a.5.5 0 0 1-.95.074z"/></svg></div>
+        <h3>Tests generated from user stories</h3>
+        <p>Requirements and acceptance criteria become draft test cases automatically, so coverage tracks the backlog instead of lagging quarters behind it.</p>
+        <div class="where mono">Cuts authoring time, lifts coverage</div>
+      </div>
+      <div class="cap-item">
+        <div class="chip persona"><svg viewBox="0 0 24 24" class="ic"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="m9 12 2 2 4-4"/></svg></div>
+        <h3>Self-healing automation</h3>
+        <p>Locators that adapt when the UI shifts, so a renamed element does not break the suite. Maintenance stops eating the time meant for new coverage.</p>
+        <div class="where mono">Cuts the maintenance tax</div>
+      </div>
+      <div class="cap-item">
+        <div class="chip persona"><svg viewBox="0 0 24 24" class="ic"><path d="M3 3v16a2 2 0 0 0 2 2h16"/><path d="m19 9-5 5-4-4-3 3"/></svg></div>
+        <h3>Risk-based test selection</h3>
+        <p>Change analysis runs the tests most likely to catch a regression first, so a fraction of the suite protects the release without the full run.</p>
+        <div class="where mono">Shortens the path to a safe release</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section style="background:var(--bg);">
+  <div class="container">
+    <div class="stats">
+      <div class="swap" data-key="stat1">
+        <div class="stat-num"><span class="accent">30 to 50%</span></div>
+        <div class="stat-label">more code volume on teams that adopted AI coding tools</div>
+      </div>
+      <div class="swap" data-key="stat2">
+        <div class="stat-num"><span class="accent">20 to 30%</span></div>
+        <div class="stat-label">typical rise in escaped defects when QE does not scale with code volume</div>
+      </div>
+      <div class="swap" data-key="stat3">
+        <div class="stat-num"><span class="accent">4 to 6 weeks</span></div>
+        <div class="stat-label">from kickoff to a working regression suite in production</div>
+      </div>
+    </div>
+    <p class="figures-note">Ranges reflect published industry studies on AI-assisted development and test automation. Named results are representative of Tezo engagements and vary by context; client identities are shared on request, under reference approval.</p>
+  </div>
+</section>
+
+<section class="proof">
+  <div class="container proof-grid">
+    <div>
+      <div class="section-eyebrow swap" data-key="proof-eyebrow">Recent work / for engineering</div>
+      <div class="proof-title swap" data-key="proof-title">A SaaS team shipping weekly held velocity, while cutting change failure rate by more than half.</div>
+    </div>
+    <div>
+      <p class="proof-body swap" data-key="proof-body">Twelve weeks. Deployment frequency held at <strong>three releases per week</strong>. We rebuilt regression on self-healing infrastructure, generated coverage from user stories, and routed risk-based selection ahead of every deploy. The team stayed the same size.</p>
+      <div class="proof-metrics swap" data-key="proof-metrics">
+        <div class="proof-metric"><div class="v">18% &rarr; 7%</div><div class="l">Change failure rate</div></div>
+        <div class="proof-metric"><div class="v">3x</div><div class="l">Test coverage</div></div>
+        <div class="proof-metric"><div class="v">0</div><div class="l">Headcount added</div></div>
+      </div>
+      <div class="testimonial">
+        <p class="quote swap" data-key="quote-text">We were shipping weekly, but our change failure rate kept climbing. Adding testers was never going to fix what was really a judgment problem.</p>
+        <p class="attr swap" data-key="quote-attr">VP Engineering, B2B SaaS platform</p>
+        <p class="repnote">Representative of recent engagements. Client identities withheld pending reference approval.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="timeline-section" id="solve">
+  <div class="container">
+    <div class="timeline-head">
+      <div>
+        <div class="section-eyebrow">How we solve it / the assessment</div>
+        <h2>A two to three week assessment. Same shape every time, tuned to the question that matters most for your role.</h2>
+      </div>
+      <div class="note swap" data-key="lens-note">
+        <span class="lens">Your lens</span>
+        We run the engagement against your DORA metrics and AI-coding adoption timeline. The synthesis ranks initiatives by their effect on change failure rate first.
+      </div>
+    </div>
+    <div class="timeline">
+      <div class="day">
+        <div class="day-marker mono">DAY 01</div>
+        <div class="day-content">
+          <h3>Kickoff and access</h3>
+          <p>A two-hour working session with your QA, engineering, and product leads. We name the three things this assessment has to answer.</p>
+          <span class="deliv mono">&rarr; Scope brief signed</span>
+        </div>
+      </div>
+      <div class="day">
+        <div class="day-marker mono">DAYS 02 TO 05</div>
+        <div class="day-content">
+          <h3>Coverage instrumentation</h3>
+          <p>We map your existing test estate against business-critical paths. Static analysis on the suite, plus conversations with the people who maintain it.</p>
+          <span class="deliv mono">&rarr; Coverage heat-map</span>
+        </div>
+      </div>
+      <div class="day">
+        <div class="day-marker mono">DAYS 06 TO 09</div>
+        <div class="day-content">
+          <h3 class="swap" data-key="day-mid-title">Defect leakage and DORA correlation</h3>
+          <p class="swap" data-key="day-mid-body">Six months of production defects pulled, classified, and traced. Then correlated to your AI-tooling adoption date so the cause and effect is visible, not assumed.</p>
+          <span class="deliv mono">&rarr; Leakage report</span>
+        </div>
+      </div>
+      <div class="day">
+        <div class="day-marker mono">DAYS 10 TO 12</div>
+        <div class="day-content">
+          <h3>Roadmap synthesis</h3>
+          <p>Twelve candidate initiatives, modeled for time, cost, and outcome. Ranked by ROI. The ones we would skip, called out by name.</p>
+          <span class="deliv mono">&rarr; Initiative ledger</span>
+        </div>
+      </div>
+      <div class="day">
+        <div class="day-marker mono">DAYS 13 TO 14</div>
+        <div class="day-content">
+          <h3>Pressure test</h3>
+          <p>We walk the findings past your engineering leads. Anything that does not survive their pushback gets cut or rewritten before the readout.</p>
+          <span class="deliv mono">&rarr; Revised draft</span>
+        </div>
+      </div>
+      <div class="day">
+        <div class="day-marker mono">DAY 15</div>
+        <div class="day-content">
+          <h3>Readout and handoff</h3>
+          <p>A ninety-minute readout with the team you want in the room. Final deck, raw artifacts, recordings. Yours to execute with us or without.</p>
+          <span class="deliv mono">&rarr; Everything you paid for</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="deliverables">
+  <div class="container">
+    <div class="deliverables-head">
+      <div class="section-eyebrow">What you walk away with</div>
+      <h2>Three artifacts, not a deck of motherhood statements.</h2>
+    </div>
+    <div class="deliv-grid">
+      <div class="deliv-cell">
+        <div class="num mono">/ 01</div>
+        <h3>Coverage audit</h3>
+        <p>Where your testing actually sits against business-critical paths, heat-mapped, with the gaps named and prioritized rather than described in the abstract.</p>
+      </div>
+      <div class="deliv-cell">
+        <div class="num mono">/ 02</div>
+        <h3>Defect-leakage analysis</h3>
+        <p>The defects your customers find that your tests do not, classified by root cause, with the cost of prevention estimated for each pattern.</p>
+      </div>
+      <div class="deliv-cell">
+        <div class="num mono">/ 03</div>
+        <h3>ROI-ranked roadmap</h3>
+        <p>A sequenced set of initiatives with investment, effort, and expected outcome for each. The ones we would skip are named explicitly.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="ladder-section">
+  <div class="container">
+    <div class="ladder-head">
+      <div class="section-eyebrow">The path, and where you choose to stop</div>
+      <h2>Start with the assessment. Decide the rest once you have the findings.</h2>
+      <p>Each step is a decision point, not a commitment to the next. Many teams stop after the assessment and run the roadmap themselves. That is a good outcome too.</p>
+    </div>
+    <div class="ladder">
+      <div class="step">
+        <div class="step-num mono">/ 01</div>
+        <div class="step-label">Free</div>
+        <div class="step-title">Maturity Assessment</div>
+        <div class="step-desc">A 10-minute scored self-assessment. Where you sit against benchmarks, emailed as a PDF.</div>
+      </div>
+      <div class="step featured">
+        <div class="step-num mono">/ 02</div>
+        <div class="step-label">From $15K, fixed</div>
+        <div class="step-title swap" data-key="ladder-step2-title">The Velocity Audit</div>
+        <div class="step-desc">The two to three week assessment. Coverage audit, defect-leakage analysis, ROI-ranked roadmap. Yours to keep.</div>
+      </div>
+      <div class="step">
+        <div class="step-num mono">/ 03</div>
+        <div class="step-label">Outcome-priced</div>
+        <div class="step-title">8 to 12 week pilot</div>
+        <div class="step-desc">One critical application. Coverage and cycle-time targets agreed upfront and reviewed weekly.</div>
+      </div>
+      <div class="step">
+        <div class="step-num mono">/ 04</div>
+        <div class="step-label">Retainer</div>
+        <div class="step-title">Managed QE Pod</div>
+        <div class="step-desc">An embedded squad with SLAs on coverage, cycle time, and escape rate. The destination engagement.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="who" id="who">
+  <div class="container">
+    <div class="section-eyebrow">Who we are</div>
+    <p class="who-lead">This is the Quality Engineering practice inside Tezo, an AI and digital transformation partner that helps enterprises modernize faster and scale smarter. Clients move off legacy vendors and onto Tezo for one reason. <em>We are here to deliver results, not decks.</em></p>
+    <div class="who-stats">
+      <div class="who-stat"><div class="v">250+</div><div class="l">specialists across AI, data, and digital</div></div>
+      <div class="who-stat"><div class="v">84+</div><div class="l">enterprise transformation programs delivered</div></div>
+      <div class="who-stat"><div class="v">3+</div><div class="l">product IPs built and shipped in-house</div></div>
+    </div>
+    <div class="who-grid">
+      <div class="who-item">
+        <div class="chip persona"><svg viewBox="0 0 24 24" class="ic"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg></div>
+        <div class="n mono">/ 01</div>
+        <h3>A small, senior pod with an enterprise bench</h3>
+        <p>The QE practice stays deliberately small and senior. Behind it sits Tezo's full AI, data, and digital capability, so a focused team is never a thin one. The engineers on the call are the engineers on the build.</p>
+      </div>
+      <div class="who-item">
+        <div class="chip persona"><svg viewBox="0 0 24 24" class="ic"><polygon points="12 2 2 7 12 12 22 7 12 2"/><polyline points="2 17 12 22 22 17"/><polyline points="2 12 12 17 22 12"/></svg></div>
+        <div class="n mono">/ 02</div>
+        <h3>We work like a product company, even when we consult</h3>
+        <p>Tezo brings product-grade craft to services work at consulting speed. Every engagement starts with a shared definition of success and is shaped by feedback, not tickets. Outcomes are priced, not hours.</p>
+      </div>
+      <div class="who-item">
+        <div class="chip persona"><svg viewBox="0 0 24 24" class="ic"><path d="M4.5 16.5c-1.5 1.26-2 5-2 5s3.74-.5 5-2c.71-.84.7-2.13-.09-2.91a2.18 2.18 0 0 0-2.91-.09z"/><path d="m12 15-3-3a22 22 0 0 1 2-3.95A12.88 12.88 0 0 1 22 2c0 2.72-.78 7.5-6 11a22.35 22.35 0 0 1-4 2z"/><path d="M9 12H4s.55-3.03 2-4c1.62-1.08 5 0 5 0"/><path d="M12 15v5s3.03-.55 4-2c1.08-1.62 0-5 0-5"/></svg></div>
+        <div class="n mono">/ 03</div>
+        <h3>From PoCs to pipelines</h3>
+        <p>Tezo takes AI and quality work past the prototype and into production. The frameworks, runbooks, and artifacts we build are yours from day one. If your team can run it without us, we say so.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="insights" id="insights">
+  <div class="container">
+    <div class="insights-head">
+      <div class="section-eyebrow">Insights and tools</div>
+      <h2>Three ways to engage before you ever book a call.</h2>
+      <p>Use them in any order. Each one is built to be useful on its own, whether or not we ever speak.</p>
+    </div>
+    <div class="insight-grid">
+      <div class="insight-card">
+        <div class="insight-tag">Interactive &middot; Assessment</div>
+        <h3>QE Maturity Assessment</h3>
+        <p>A short, scored questionnaire that places your quality function on a five-level maturity curve across the pillars that matter, then returns a benchmark and a PDF you keep. Ten minutes, no sales call attached.</p>
+        <div class="insight-foot"><span class="insight-soon">Launching soon</span></div>
+      </div>
+      <div class="insight-card">
+        <div class="insight-tag">Report &middot; Gated</div>
+        <h3>State of AI in QE, 2026</h3>
+        <p>Our field report on what AI has actually done to software quality, built on the World Quality Report, Google DORA, and GitClear. AI now touches most code, yet delivery stability has slipped and duplicated code has multiplied.</p>
+        <div class="insight-foot"><a href="#" class="insight-link"><span>Read the report</span><span class="arrow">&rarr;</span></a></div>
+      </div>
+      <div class="insight-card">
+        <div class="insight-tag">Point of view</div>
+        <h3>Who tests the AI?</h3>
+        <p>Our position on testing software that no longer behaves predictably. As generative AI features reach production, exact-match testing quietly breaks, and evals, guardrails, and continuous evaluation become the new safety net.</p>
+        <div class="insight-foot"><a href="QE-POV-Who-Tests-the-AI.pdf" class="insight-link"><span>Read the POV</span><span class="arrow">&rarr;</span></a></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="final" id="book">
+  <div class="container">
+    <div class="tag swap" data-key="final-tag">Book a 30-minute scoping call</div>
+    <h2>Thirty minutes to scope it. Two to three weeks to answer it.</h2>
+    <p>If release quality is a board-level conversation for you in 2026, this is the lowest-risk way to know exactly where you stand.</p>
+    <a href="#" class="final-cta">
+      <span class="swap" data-key="final-cta">Book the Velocity Audit</span>
+      <span class="arrow">&rarr;</span>
+    </a>
+  </div>
+</section>
+
+<footer>
+  <div class="container foot">
+    <div>&copy; 2026 Tezo &middot; Quality Engineering Practice</div>
+    <div>
+      <a href="#">Approach</a>
+      <a href="#">Assessment scope (PDF)</a>
+      <a href="#">Contact</a>
+    </div>
+  </div>
+</footer>
+
+<script>
+  const content = {
+    eng: {
+      eyebrow: "For VPs of Engineering / CTOs",
+      lede: "Your teams ship faster than they ever have. Quality is now the thing that decides whether that speed reaches customers or stalls right before it does. We run a two to three week assessment, then embed AI-augmented QE pods that <strong>turn quality from the bottleneck into the accelerator,</strong> without growing your headcount.",
+      "card-tag": "Start here", "card-name": "The Velocity Audit",
+      "card-frame": "A two to three week QE assessment framed in DORA metrics. Same engagement, tuned to engineering leadership.",
+      "card-cta": "Book a scoping call",
+      stat1: '<div class="stat-num"><span class="accent">30 to 50%</span></div><div class="stat-label">more code volume on teams that adopted AI coding tools</div>',
+      stat2: '<div class="stat-num"><span class="accent">20 to 30%</span></div><div class="stat-label">typical rise in escaped defects when QE does not scale with code volume</div>',
+      stat3: '<div class="stat-num"><span class="accent">4 to 6 weeks</span></div><div class="stat-label">from kickoff to a working regression suite in production</div>',
+      "proof-eyebrow": "Recent work / for engineering",
+      "proof-title": "A SaaS team shipping weekly held velocity, while cutting change failure rate by more than half.",
+      "proof-body": "Twelve weeks. Deployment frequency held at <strong>three releases per week</strong>. We rebuilt regression on self-healing infrastructure, generated coverage from user stories, and routed risk-based selection ahead of every deploy. The team stayed the same size.",
+      "proof-metrics": '<div class="proof-metric"><div class="v">18% &rarr; 7%</div><div class="l">Change failure rate</div></div><div class="proof-metric"><div class="v">3x</div><div class="l">Test coverage</div></div><div class="proof-metric"><div class="v">0</div><div class="l">Headcount added</div></div>',
+      "quote-text": "We were shipping weekly, but our change failure rate kept climbing. Adding testers was never going to fix what was really a judgment problem.",
+      "quote-attr": "VP Engineering, B2B SaaS platform",
+      "lens-note": '<span class="lens">Your lens</span>We run the engagement against your DORA metrics and AI-coding adoption timeline. The synthesis ranks initiatives by their effect on change failure rate first.',
+      "day-mid-title": "Defect leakage and DORA correlation",
+      "day-mid-body": "Six months of production defects pulled, classified, and traced. Then correlated to your AI-tooling adoption date so the cause and effect is visible, not assumed.",
+      "ladder-step2-title": "The Velocity Audit", "final-tag": "Book a 30-minute scoping call", "final-cta": "Book the Velocity Audit"
+    },
+    qa: {
+      eyebrow: "For VPs / Directors of Quality",
+      lede: "Your automation suite has quietly become more maintenance than testing, and coverage has not moved in quarters. We run a two to three week assessment, then rebuild on self-healing automation and AI-generated tests so <strong>coverage grows without growing the team.</strong>",
+      "card-tag": "Start here", "card-name": "The Automation Audit",
+      "card-frame": "A two to three week QE assessment of your test estate. Same engagement, tuned to quality leadership.",
+      "card-cta": "Audit our automation",
+      stat1: '<div class="stat-num"><span class="accent">35 to 45%</span></div><div class="stat-label">of automation time spent fixing flaky tests, not adding coverage</div>',
+      stat2: '<div class="stat-num"><span class="accent">18% &rarr; 60%</span></div><div class="stat-label">coverage uplift in ten weeks on a recent engagement</div>',
+      stat3: '<div class="stat-num"><span class="accent">95%</span></div><div class="stat-label">of defects caught running 20% of the suite, intelligent selection</div>',
+      "proof-eyebrow": "Recent work / for quality",
+      "proof-title": "An insurance carrier moved from an 18-percent suite to a working safety net in ten weeks.",
+      "proof-body": "We rebuilt the framework on self-healing locators, generated the missing coverage from existing user stories, and added risk-based selection ahead of every release. <strong>Regression cycle went from two weeks to two days.</strong> No new automation engineers.",
+      "proof-metrics": '<div class="proof-metric"><div class="v">18% &rarr; 60%</div><div class="l">Coverage</div></div><div class="proof-metric"><div class="v">2wk &rarr; 2d</div><div class="l">Regression cycle</div></div><div class="proof-metric"><div class="v">0</div><div class="l">Engineers added</div></div>',
+      "quote-text": "We were struggling with a legacy architecture where automation was not really possible, and a fifty-person manual QA vendor that had become slower, not safer.",
+      "quote-attr": "Director of Quality, insurance carrier",
+      "lens-note": '<span class="lens">Your lens</span>We profile your current automation in numbers: flaky-test rate, locator instability, maintenance hours. The synthesis costs out self-healing automation against your suite.',
+      "day-mid-title": "Defect leakage and flakiness analysis",
+      "day-mid-body": "Six months of production defects pulled, classified, and traced back to where they should have been caught. We also measure flaky-test burden and locator instability in numbers, not anecdotes.",
+      "ladder-step2-title": "The Automation Audit", "final-tag": "Book a 30-minute scoping call", "final-cta": "Book the Automation Audit"
+    },
+    cio: {
+      eyebrow: "For CIOs / IT Directors",
+      lede: "Late UAT discovery. Business users buried in spreadsheets. Regression managed by tribal knowledge. We run a two to three week assessment, then stand up <strong>migration test factories</strong> that take the UAT burden off your team and <strong>protect your go-live date.</strong>",
+      "card-tag": "Start here", "card-name": "Migration Readiness Review",
+      "card-frame": "A two to three week QE assessment of your migration test plan. Same engagement, tuned to platform transitions.",
+      "card-cta": "Run a readiness review",
+      stat1: '<div class="stat-num"><span class="accent">70%</span></div><div class="stat-label">reduction in business-user UAT time on a typical migration</div>',
+      stat2: '<div class="stat-num"><span class="accent">4 to 6 weeks</span></div><div class="stat-label">from contract to a working test factory parallel to your build</div>',
+      stat3: '<div class="stat-num"><span class="accent">~60%</span></div><div class="stat-label">of ERP go-live delays trace back to testing, not the build</div>',
+      "proof-eyebrow": "Recent work / for technology",
+      "proof-title": "A manufacturer migrated to D365 Finance on plan, after a previous attempt slipped twice.",
+      "proof-body": "We stood up a parallel test factory in week three, pulled <strong>270 business-user UAT hours back</strong> across the program, and ran daily regression against the integration layer. Cutover weekend went clean. Zero P1 defects logged in the first 30 days.",
+      "proof-metrics": '<div class="proof-metric"><div class="v">270 hrs</div><div class="l">UAT time saved</div></div><div class="proof-metric"><div class="v">6wk &rarr; 2wk</div><div class="l">UAT cycle</div></div><div class="proof-metric"><div class="v">0</div><div class="l">P1 defects, day 30</div></div>',
+      "quote-text": "Every migration we had run slipped on testing, never on development. We needed the date protected, not another status deck.",
+      "quote-attr": "CIO, manufacturing group",
+      "lens-note": '<span class="lens">Your lens</span>We assess your migration against go-live risk, not feature parity. The synthesis names the slip-risks by date and the moves that take them off the critical path.',
+      "day-mid-title": "UAT readiness and slip-risk mapping",
+      "day-mid-body": "Six months of program risks pulled and classified. We then map UAT readiness against the migration timeline, calling out where late discovery is most likely to slip the date.",
+      "ladder-step2-title": "Migration Readiness Review", "final-tag": "Book a 30-minute scoping call", "final-cta": "Book the Migration Readiness Review"
+    }
+  };
+
+  const pills = document.querySelectorAll('.role-pill');
+
+  function setRole(role) {
+    const data = content[role];
+    document.querySelectorAll('.swap').forEach(el => el.classList.add('out'));
+    setTimeout(() => {
+      document.querySelectorAll('.swap').forEach(el => {
+        const key = el.getAttribute('data-key');
+        if (data[key] !== undefined) el.innerHTML = data[key];
+      });
+      document.querySelectorAll('.swap').forEach(el => el.classList.remove('out'));
+    }, 280);
+  }
+
+  pills.forEach(p => p.addEventListener('click', () => {
+    pills.forEach(x => x.classList.remove('active'));
+    p.classList.add('active');
+    setRole(p.dataset.role);
+  }));
+</script>
+</body>
+</html>

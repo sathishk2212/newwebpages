@@ -1,0 +1,1186 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+<title>TEZO — AI Readiness Advisor</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<style>
+/* ============================================================
+   TEZO theme — matches tezo.com (dark navy + purple→blue gradient)
+   No-scroll bot layout
+   ============================================================ */
+:root{
+  --bg:           #050505;
+  --bg-2:         #0d0d0d;
+  --surface:      rgba(255,255,255,0.04);
+  --surface-2:    rgba(255,255,255,0.06);
+  --border:       rgba(255,255,255,0.08);
+  --border-2:     rgba(255,255,255,0.14);
+
+  --ink:          #ffffff;
+  --ink-2:        #cdd3e6;
+  --muted:        #8a92b2;
+  --muted-2:      #6b7290;
+
+  --primary:      #e54a59;
+  --secondary:    #4e3aad;
+  --accent:       #b0a8fe;
+  --violet:       #4e3aad;
+  --violet-2:     #b0a8fe;
+  --blue:         #4e3aad;
+  --blue-2:       #b0a8fe;
+  --cyan:         #22d3ee;
+  --green:        #22c55e;
+  --amber:        #f59e0b;
+  --red:          #ef4444;
+
+  --grad:         linear-gradient(135deg,#e54a59 0%, #4e3aad 100%);
+  --grad-soft:    linear-gradient(135deg, rgba(139,92,246,.16), rgba(59,130,246,.16));
+
+  --shadow:       0 18px 50px rgba(0,0,0,.45), 0 2px 10px rgba(139,92,246,.10);
+}
+*{box-sizing:border-box}
+html,body{margin:0;padding:0;background:var(--bg);color:var(--ink);font-family:'Inter',system-ui,-apple-system,Segoe UI,Roboto,sans-serif;-webkit-font-smoothing:antialiased;height:100%;overflow:hidden}
+a{color:var(--blue-2);text-decoration:none}
+a:hover{color:var(--violet-2)}
+button{font-family:inherit}
+
+/* Ambient background */
+body::before{
+  content:"";position:fixed;inset:0;z-index:-2;pointer-events:none;
+  background:
+    radial-gradient(900px 600px at 12% -10%, rgba(139,92,246,.22), transparent 60%),
+    radial-gradient(800px 600px at 105% 10%, rgba(59,130,246,.20), transparent 60%),
+    radial-gradient(600px 400px at 50% 110%, rgba(34,211,238,.10), transparent 60%);
+}
+body::after{
+  content:"";position:fixed;inset:0;z-index:-1;pointer-events:none;opacity:.40;
+  background-image:
+    linear-gradient(rgba(255,255,255,.04) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255,255,255,.04) 1px, transparent 1px);
+  background-size: 60px 60px, 60px 60px;
+  mask-image: radial-gradient(800px 600px at 50% 35%, #000 30%, transparent 75%);
+  -webkit-mask-image: radial-gradient(800px 600px at 50% 35%, #000 30%, transparent 75%);
+}
+
+/* App shell — full-height, no scroll */
+.app{
+  display:flex;flex-direction:column;
+  height:100vh;max-width:920px;margin:0 auto;
+  position:relative;overflow:hidden
+}
+
+/* Header */
+.app-header{
+  flex-shrink:0;
+  display:flex;align-items:center;justify-content:space-between;
+  padding:16px 22px;border-bottom:1px solid var(--border);
+  backdrop-filter:blur(10px);
+  background:linear-gradient(180deg, rgba(6,8,26,.75), rgba(6,8,26,.55));
+  z-index:10
+}
+.brand{display:flex;align-items:center;gap:14px}
+.brand-logo{
+  width:42px;height:42px;border-radius:13px;background:var(--grad);
+  display:flex;align-items:center;justify-content:center;font-weight:800;color:#fff;letter-spacing:.5px;
+  box-shadow:0 8px 28px rgba(139,92,246,.35), inset 0 0 0 1px rgba(255,255,255,.18);
+  position:relative;font-family:'Inter',sans-serif;font-size:14px
+}
+.brand-logo::after{content:"";position:absolute;right:-3px;bottom:-3px;width:13px;height:13px;background:var(--green);border:2px solid var(--bg);border-radius:50%;box-shadow:0 0 12px rgba(34,197,94,.6)}
+.brand-title{font-weight:700;font-size:15px;line-height:1.2;letter-spacing:-.01em}
+.brand-sub{font-size:11px;color:var(--muted);font-weight:500;margin-top:2px}
+.header-right{font-size:12px;color:var(--muted)}
+.header-right a{margin-left:6px;color:var(--blue-2);font-weight:600}
+
+/* Top progress bar */
+.top-progress{position:relative;height:3px;background:rgba(255,255,255,.06);overflow:hidden;flex-shrink:0}
+.top-progress .bar{position:absolute;inset:0;width:0%;background:#e54a59;transition:width .4s cubic-bezier(.22,.61,.36,1);box-shadow:none}
+
+/* ============== STAGE (single, swappable, no scroll) ============== */
+.stage{
+  flex:1;
+  display:flex;flex-direction:column;
+  padding:22px 22px 16px;
+  position:relative;
+  overflow:hidden;
+  min-height:0
+}
+
+.tezo-logo,
+.tezo-avatar{
+    background-image:url('./Tezo.svg');
+    background-repeat:no-repeat;
+    background-position:center;
+    background-size:75%;
+    color:transparent;
+    font-size:0;
+}
+
+.tezo-logo{
+    background-size:80%;
+}
+
+.tezo-avatar{
+    background-size:70%;
+}
+
+/* Stage scenes — only one is .active at a time */
+.scene{
+  position:absolute;inset:22px 22px 16px;
+  display:flex;flex-direction:column;justify-content:flex-start;padding-top:24px;
+  opacity:0;transform:translateY(8px) scale(.99);
+  transition:opacity .35s ease, transform .35s cubic-bezier(.22,.61,.36,1);
+  pointer-events:none
+}
+.scene.active{opacity:1;transform:translateY(0) scale(1);pointer-events:auto}
+.scene.exiting{opacity:0;transform:translateY(-8px) scale(.99)}
+
+/* Bot question bubble inside stage */
+.q-card{
+  display:flex;gap:14px;align-items:flex-start;
+  max-width:680px;margin:0 auto;width:100%
+}
+.avatar{
+  width:48px;
+  height:48px;
+  border-radius:50%;
+  flex-shrink:0;
+
+  background-color:#111111;
+  background-image:url('./Tezo.svg');
+  background-repeat:no-repeat;
+  background-position:center;
+  background-size:85%;
+
+  border:1px solid rgba(176,168,254,.15);
+
+  display:flex;
+  align-items:center;
+  justify-content:center;
+}
+.bubble{
+  padding:18px 22px;line-height:1.5;font-size:15px;color:var(--ink);
+  background:var(--surface);border:1px solid var(--border);border-radius:18px;border-top-left-radius:6px;
+  box-shadow:0 12px 36px rgba(0,0,0,.30);
+  backdrop-filter:blur(8px);
+  flex:1
+}
+
+.qtag{
+  display:inline-flex;align-items:center;gap:6px;
+  font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;
+  color:var(--violet-2);background:rgba(139,92,246,.10);border:1px solid rgba(139,92,246,.25);
+  padding:4px 10px;border-radius:99px;margin-bottom:12px
+}
+.qtag .dot{width:5px;height:5px;background:var(--violet-2);border-radius:50%;box-shadow:0 0 8px var(--violet-2);animation:pulse 2s infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
+.qbody{font-size:18px;font-weight:600;line-height:1.4;color:#fff;letter-spacing:-.005em;margin-bottom:6px}
+.q-hint{font-size:12.5px;color:var(--muted);margin-top:8px}
+
+/* Last-answer chip (shows briefly above next question) */
+.last-answer{
+  position:absolute;top:14px;left:50%;transform:translateX(-50%);
+  background:var(--grad);color:#fff;font-weight:700;font-size:12px;
+  padding:6px 14px;border-radius:99px;
+  box-shadow:0 10px 26px rgba(139,92,246,.32), inset 0 0 0 1px rgba(255,255,255,.15);
+  opacity:0;animation:floatUp 1.6s ease;
+  pointer-events:none;z-index:6;white-space:nowrap
+}
+@keyframes floatUp{
+  0%  {opacity:0;transform:translate(-50%,16px)}
+  18% {opacity:1;transform:translate(-50%,0)}
+  78% {opacity:1;transform:translate(-50%,0)}
+  100%{opacity:0;transform:translate(-50%,-12px)}
+}
+
+/* Typing dots */
+.typing{display:inline-flex;gap:5px;align-items:center;padding:6px 0}
+.typing span{width:7px;height:7px;background:var(--violet-2);border-radius:50%;animation:blink 1.2s infinite}
+.typing span:nth-child(2){animation-delay:.15s;background:var(--blue-2)}
+.typing span:nth-child(3){animation-delay:.3s;background:var(--cyan)}
+@keyframes blink{0%,80%,100%{opacity:.25;transform:translateY(0)}40%{opacity:1;transform:translateY(-3px)}}
+
+/* ============== Composer (rating dock) ============== */
+.composer{
+  flex-shrink:0;
+  background:#000000;
+  border-top:1px solid var(--border);
+  padding:14px 22px 16px;
+  backdrop-filter:blur(14px);
+  position:relative;z-index:5
+}
+.composer-inner{max-width:760px;margin:0 auto}
+.composer-label{
+  font-size:11px;color:var(--muted);font-weight:700;letter-spacing:.07em;text-transform:uppercase;
+  display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;
+}
+.composer-label .info-toggle{
+  background:none;border:1px solid var(--border);color:var(--blue-2);font-weight:600;cursor:pointer;
+  font-size:11px;display:inline-flex;align-items:center;gap:5px;padding:5px 10px;border-radius:99px;
+  text-transform:none;letter-spacing:0
+}
+.composer-label .info-toggle:hover{background:rgba(59,130,246,.10);border-color:rgba(59,130,246,.35)}
+
+.rating{display:flex;gap:8px;flex-wrap:wrap}
+.rating button{
+  flex:1;min-width:88px;border:1px solid var(--border-2);background:rgba(255,255,255,.03);color:var(--ink);
+  font-weight:800;font-size:18px;padding:14px 0 12px;border-radius:14px;cursor:pointer;
+  transition:all .14s ease;position:relative;letter-spacing:-.01em
+}
+.rating button .lab{display:block;font-size:10.5px;font-weight:600;color:var(--muted);margin-top:4px;text-transform:uppercase;letter-spacing:.06em}
+.rating button:hover{border-color:var(--violet);transform:translateY(-2px);box-shadow:0 12px 30px rgba(139,92,246,.18);background:rgba(139,92,246,.06)}
+.rating button.active{
+  background:#e54a59;color:#fff;border-color:transparent;
+  box-shadow:0 16px 36px rgba(139,92,246,.42), inset 0 0 0 1px rgba(255,255,255,.2)
+}
+.rating button.active .lab{color:rgba(255,255,255,.85)}
+
+/* Inline option-detail popover */
+.opt-details{
+  margin-top:12px;background:var(--surface-2);border:1px solid var(--border);border-radius:14px;padding:12px 14px;
+  max-height:0;overflow:hidden;opacity:0;transition:max-height .25s ease, opacity .2s ease, padding .25s ease
+}
+.opt-details.open{max-height:260px;opacity:1;overflow-y:auto}
+.opt-details ul{margin:0;padding:0;list-style:none;display:grid;gap:8px}
+.opt-details li{display:grid;grid-template-columns:28px 1fr;gap:10px;align-items:start;font-size:12.5px;color:var(--ink-2);line-height:1.5}
+.opt-details li > b.num{display:inline-flex;align-items:center;justify-content:center;width:24px;height:24px;border-radius:7px;background:var(--grad-soft);color:#fff;font-weight:800;font-size:12px;border:1px solid var(--border)}
+.opt-details li b.lvl{color:#fff;font-weight:700}
+
+.composer-foot{display:flex;justify-content:space-between;align-items:center;margin-top:10px;font-size:11px;color:var(--muted)}
+.composer-foot .btn-back{background:transparent;border:none;color:var(--blue-2);font-weight:600;cursor:pointer;padding:4px 8px;border-radius:6px;font-size:12px}
+.composer-foot .btn-back:hover{color:var(--violet-2)}
+.composer-foot .btn-back:disabled{color:var(--muted-2);cursor:not-allowed}
+
+.composer.hidden{display:none}
+
+/* ============== Intro stage ============== */
+.intro-card{
+  display:flex;gap:14px;align-items:flex-start;
+  max-width:680px;margin:0 auto;width:100%
+}
+.intro-content{flex:1}
+.intro-greeting{font-size:14.5px;color:var(--ink-2);line-height:1.55;margin-bottom:6px}
+.intro-greeting b{color:#fff}
+.intro-form{display:grid;gap:10px;margin-top:14px}
+.intro-form .row-2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+@media (max-width:560px){.intro-form .row-2{grid-template-columns:1fr}}
+.intro-form input, .intro-form select{
+  width:100%;padding:11px 13px;background:rgba(255,255,255,.04);border:1px solid var(--border-2);border-radius:11px;
+  font-size:13.5px;font-family:inherit;color:#fff;transition:all .15s
+}
+.intro-form input::placeholder{color:var(--muted-2)}
+.intro-form input:focus,.intro-form select:focus{outline:none;border-color:var(--violet);background:rgba(139,92,246,.07);box-shadow:0 0 0 3px rgba(139,92,246,.18)}
+.intro-form select option{background:#0a0d24;color:#fff}
+.intro-form .start-row{display:flex;justify-content:flex-end;margin-top:6px}
+.btn-primary{
+  background:#e54a59;color:#fff;font-weight:700;border:none;padding:11px 22px;border-radius:11px;cursor:pointer;font-size:13.5px;letter-spacing:.01em;
+  box-shadow:none
+}
+.btn-primary:hover{transform:translateY(-1px);box-shadow:none}
+
+.intro-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:6px}
+.intro-stat{background:var(--surface);border:1px solid var(--border);border-radius:11px;padding:8px 10px;text-align:center}
+.intro-stat b{display:block;font-size:16px;font-weight:800;color:#e54a59;background:none;-webkit-text-fill-color:unset;}
+.intro-stat span{display:block;font-size:10px;color:var(--muted);font-weight:600;text-transform:uppercase;letter-spacing:.05em;margin-top:2px}
+
+/* Resume floating prompt */
+.resume-pill{
+  position:absolute;top:14px;right:24px;background:var(--surface-2);border:1px solid var(--border-2);border-radius:11px;padding:10px 14px;display:flex;gap:8px;align-items:center;font-size:12px;color:var(--ink-2);box-shadow:0 8px 22px rgba(0,0,0,.3);z-index:6;animation:fadeUp .35s
+}
+.resume-pill button{background:var(--grad);border:none;color:#fff;font-weight:700;font-size:11px;padding:5px 10px;border-radius:7px;cursor:pointer}
+.resume-pill .ghost{background:rgba(255,255,255,.08)}
+@keyframes fadeUp{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
+
+/* ============== Summary view (replaces stage; scrollable since it's a report) ============== */
+.summary{
+  position:absolute;
+  top:78px;
+  left:0;
+  right:0;
+  bottom:0;
+  overflow-y:auto;
+  padding:24px 22px 40px;
+  background:var(--bg);
+  display:none
+}
+.summary.show{display:block;animation:fadeUp .35s ease}
+.summary-hero{
+  background:linear-gradient(135deg,#11142e 0%, #181c44 100%);
+  border:1px solid var(--border-2);
+  color:#fff;border-radius:20px;padding:22px;margin-bottom:16px;
+  display:grid;grid-template-columns:1fr auto;gap:16px;align-items:center;
+  position:relative;overflow:hidden
+}
+.summary-hero::before{content:"";position:absolute;inset:0;background:radial-gradient(600px 400px at 100% 0%, rgba(139,92,246,.20), transparent 60%);pointer-events:none}
+.summary-hero h2{margin:0 0 4px;font-size:21px;letter-spacing:-.015em}
+.summary-hero .org{font-size:13px;color:var(--ink-2);font-weight:600}
+.score-circle{
+  width:130px;height:130px;border-radius:50%;background:conic-gradient(var(--violet) 0deg, rgba(255,255,255,.10) 0deg);
+  display:flex;align-items:center;justify-content:center;position:relative;
+  box-shadow:0 24px 60px rgba(139,92,246,.25)
+}
+.score-circle::before{content:"";position:absolute;inset:8px;border-radius:50%;background:#0d1130}
+.score-num{position:relative;font-size:36px;font-weight:800;letter-spacing:-.02em;text-align:center;color:#fff}
+.score-num small{display:block;font-size:10px;font-weight:600;color:var(--muted);letter-spacing:.08em;margin-top:2px}
+.verdict{display:inline-block;padding:5px 12px;border-radius:99px;font-size:11px;font-weight:800;letter-spacing:.06em;text-transform:uppercase;margin-top:8px;color:#0a0d24}
+
+.grid-2{display:grid;grid-template-columns:1.05fr .95fr;gap:14px;margin-bottom:14px}
+@media (max-width:780px){.grid-2{grid-template-columns:1fr}.summary-hero{grid-template-columns:1fr}.score-circle{margin:0 auto}}
+
+.card{background:var(--surface);border:1px solid var(--border);border-radius:18px;padding:18px;backdrop-filter:blur(8px)}
+.card h3{font-size:14px;margin:0 0 12px;color:#fff;font-weight:700;letter-spacing:-.005em}
+
+.domain-row{display:grid;grid-template-columns:1.3fr 2fr auto;gap:12px;align-items:center;padding:8px 0;border-bottom:1px solid rgba(255,255,255,.06)}
+.domain-row:last-child{border-bottom:none}
+.domain-name{font-size:12.5px;font-weight:600;color:#fff}
+.domain-bar{height:9px;background:rgba(255,255,255,.06);border-radius:99px;position:relative}
+.domain-bar .fill{height:100%;border-radius:99px;background:var(--grad);box-shadow:0 0 14px rgba(139,92,246,.4)}
+.domain-bar .marker{position:absolute;top:-3px;height:15px;width:2px;background:#fff;opacity:.4}
+.domain-bar .marker.best{background:var(--green);opacity:.85;box-shadow:0 0 6px var(--green)}
+.domain-stats{font-size:11px;color:var(--muted);min-width:90px;text-align:right;font-variant-numeric:tabular-nums}
+.domain-stats b{color:#fff;font-size:13.5px;font-weight:800}
+
+.legend{display:flex;gap:12px;font-size:11px;color:var(--muted);margin-top:8px;flex-wrap:wrap}
+.legend span{display:inline-flex;align-items:center;gap:5px}
+.legend i{width:11px;height:11px;border-radius:3px;display:inline-block}
+
+.focus-cards{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:14px}
+@media (max-width:680px){.focus-cards{grid-template-columns:1fr}}
+.focus-card{border:1px solid var(--border);border-radius:16px;padding:16px;background:var(--surface)}
+.focus-card.strong{border-color:rgba(34,197,94,.30);background:linear-gradient(180deg, rgba(34,197,94,.06), transparent)}
+.focus-card.weak{border-color:rgba(239,68,68,.30);background:linear-gradient(180deg, rgba(239,68,68,.06), transparent)}
+.focus-card h4{margin:0 0 10px;font-size:11px;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);font-weight:700}
+.focus-card.strong h4{color:#86efac}
+.focus-card.weak h4{color:#fca5a5}
+.focus-item{display:grid;grid-template-columns:1fr auto;gap:8px;padding:7px 0;border-bottom:1px dashed rgba(255,255,255,.06);font-size:12.5px}
+.focus-item:last-child{border:none}
+.focus-item .name{font-weight:600;color:#fff}
+.focus-item .score{color:var(--muted);font-weight:700;font-variant-numeric:tabular-nums}
+.focus-card .empty{color:var(--muted);font-size:12.5px;font-style:italic}
+
+.recommend ul{margin:0;padding-left:18px;color:var(--ink-2);font-size:13px;line-height:1.7}
+.recommend li{padding:2px 0}
+.recommend li::marker{color:var(--violet-2)}
+
+.cta{
+  background:linear-gradient(135deg, #1a1f48 0%, #2b1a52 100%);
+  border:1px solid var(--border-2);
+  color:#fff;border-radius:18px;padding:22px;margin-bottom:14px;
+  display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:14px;
+  position:relative;overflow:hidden
+}
+.cta::before{content:"";position:absolute;inset:0;background:radial-gradient(500px 300px at 0% 100%, rgba(59,130,246,.20), transparent 60%);pointer-events:none}
+.cta h3{margin:0 0 4px;font-size:16px;font-weight:700}
+.cta p{margin:0;font-size:13px;color:var(--ink-2)}
+.cta .cta-actions{display:flex;gap:8px;flex-wrap:wrap;position:relative;z-index:1}
+.cta .btn-light{background:#e54a59;color:#fff;padding:11px 16px;border-radius:11px;font-weight:700;font-size:13px;border:none;cursor:pointer}
+.cta .btn-light:hover{background:#f0f2ff;box-shadow:0 8px 22px rgba(255,255,255,.18)}
+.cta .btn-outline-light{background:transparent;color:#fff;border:1px solid rgba(255,255,255,.40);padding:11px 16px;border-radius:11px;font-weight:600;font-size:13px;cursor:pointer;text-decoration:none;display:inline-block}
+.cta .btn-outline-light:hover{background:rgba(255,255,255,.08);text-decoration:none}
+
+canvas{max-width:100%}
+.footer{text-align:center;color:var(--muted);font-size:11.5px;margin-top:18px}
+.hidden{display:none !important}
+
+/* PDF stage */
+#pdfStage{position:absolute;left:-9999px;top:0;width:780px;background:#fff;padding:30px;font-family:Inter,sans-serif;color:#11203b}
+#pdfStage h1{font-size:22px;margin:0 0 4px;color:#0b1b3b}
+#pdfStage .pdf-sub{font-size:12px;color:#5b6b85;margin-bottom:14px}
+#pdfStage table{width:100%;border-collapse:collapse;font-size:11px}
+#pdfStage th,#pdfStage td{border:1px solid #e3e8f1;padding:6px 8px;text-align:left}
+#pdfStage th{background:#f4f0ff;color:#3b1f74}
+#pdfStage .pdf-hero{background:linear-gradient(135deg, #2b1a52, #1a1f48);color:#fff;padding:18px;border-radius:12px;display:flex;justify-content:space-between;align-items:center}
+#pdfStage .pdf-hero .big{font-size:38px;font-weight:800}
+
+/* Compact mobile tweaks for stage so question fits without scroll */
+@media (max-height:700px){
+  .qbody{font-size:16px}
+  .bubble{padding:14px 18px}
+  .avatar{width:36px;height:36px}
+  .intro-stats{display:none}
+  .intro-greeting{font-size:13px}
+}
+@media (max-width:520px){
+  .rating button{min-width:60px;font-size:16px;padding:12px 0 10px}
+  .rating button .lab{font-size:9.5px}
+}
+</style>
+</head>
+<body>
+<div class="app">
+
+  <header class="app-header">
+    <div class="brand">
+      <div class="brand-logo tezo-logo"></div>
+      <div>
+        <div class="brand-title">TEZO — AI Readiness Advisor</div>
+        <div class="brand-sub">Data Readiness for AI · Enterprise Assessment</div>
+      </div>
+    </div>
+    <div class="header-right">
+      Questions? <a href="mailto:Sales@tezo.com">Sales@tezo.com</a>
+    </div>
+  </header>
+
+  <div class="top-progress"><div class="bar" id="topBar"></div></div>
+
+  <!-- ============== STAGE (one scene visible at a time) ============== -->
+  <main class="stage" id="stage">
+    <!-- Intro scene -->
+    <section class="scene" id="introScene">
+      <div class="intro-card">
+        <div class="avatar tezo-avatar"></div>
+        <div class="intro-content">
+          <div class="bubble">
+            <div class="intro-greeting">Hi 👋 I'm <b>Tezo's AI Readiness Advisor</b>.<br/>
+            <b>12 quick questions</b> across 8 data domains — under a minute. You'll get an instant score, benchmarks vs. industry, and a downloadable PDF.</div>
+
+            <div class="intro-form" id="introForm">
+              <div class="row-2">
+                <input id="f_org"  type="text"  placeholder="Organization" autocomplete="organization" />
+                <select id="f_ind">
+                  <option value="">Industry</option>
+                  <option>Banking &amp; Financial Services</option>
+                  <option>Insurance</option>
+                  <option>Healthcare &amp; Life Sciences</option>
+                  <option>Manufacturing</option>
+                  <option>Retail &amp; CPG</option>
+                  <option>Technology / Software</option>
+                  <option>Telecom &amp; Media</option>
+                  <option>Energy &amp; Utilities</option>
+                  <option>Public Sector</option>
+                  <option>Other</option>
+                </select>
+              </div>
+              <div class="row-2">
+                <input id="f_name"  type="text"  placeholder="Name" autocomplete="name" />
+                <input id="f_email" type="email" placeholder="Email" autocomplete="email" />
+              </div>
+              <div class="intro-stats">
+                <div class="intro-stat"><b>12</b><span>Questions</span></div>
+                <div class="intro-stat"><b>8</b><span>Data Domains</span></div>
+                <div class="intro-stat"><b>~1 min</b><span>To Complete</span></div>
+              </div>
+              <div class="start-row">
+                <button class="btn-primary" id="startBtn">Begin assessment →</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Question scene (content rendered dynamically) -->
+    <section class="scene" id="questionScene">
+      <div class="q-card">
+        <div class="avatar tezo-avatar"></div>
+        <div class="bubble" id="qBubble"></div>
+      </div>
+    </section>
+
+    <!-- Calculating scene -->
+    <section class="scene" id="calcScene">
+      <div class="q-card">
+        <div class="avatar tezo-avatar"></div>
+        <div class="bubble">
+          <div class="qbody">All done! 🎯</div>
+          <div class="q-hint">Calculating your readiness score and benchmarking against industry medians…</div>
+          <div class="typing" style="margin-top:10px"><span></span><span></span><span></span></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Floating last-answer chip overlay -->
+    <div id="lastAnswerHost"></div>
+    <!-- Resume pill overlay -->
+    <div id="resumeHost"></div>
+  </main>
+
+  <!-- ============== Composer (rating dock) ============== -->
+  <div class="composer hidden" id="composer">
+    <div class="composer-inner">
+      <div class="composer-label">
+        <span id="composerLabel">Tap your score — auto-advances</span>
+        <button class="info-toggle" id="infoToggle" type="button">ⓘ What do these levels mean?</button>
+      </div>
+      <div class="rating" id="ratingBar"></div>
+      <div class="opt-details" id="optDetails"><ul id="optDetailsList"></ul></div>
+      <div class="composer-foot">
+        <button class="btn-back" id="backBtn">← Previous question</button>
+        <span id="autoNote">Auto-advance enabled</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============== Summary view (replaces stage) ============== -->
+  <section class="summary" id="summaryView">
+    <div class="summary-hero">
+      <div>
+        <div class="org" id="summaryOrg"></div>
+        <h2>Your AI Data Readiness</h2>
+        <div id="verdictPill" class="verdict"></div>
+        <div style="color:var(--ink-2);font-size:13px;margin-top:8px" id="verdictLine"></div>
+      </div>
+      <div class="score-circle" id="scoreCircle">
+        <div class="score-num"><span id="overallScore">0</span><small>OUT OF 100</small></div>
+      </div>
+    </div>
+
+    <div class="grid-2">
+      <div class="card">
+        <h3>Domain readiness — you vs. benchmarks</h3>
+        <canvas id="radarChart" height="320"></canvas>
+        <div class="legend">
+          <span><i style="background:#8b5cf6"></i> Your score</span>
+          <span><i style="background:#f59e0b"></i> Industry median</span>
+          <span><i style="background:#22c55e"></i> Best practice</span>
+        </div>
+      </div>
+      <div class="card">
+        <h3>Domain scores at a glance</h3>
+        <div id="domainBars"></div>
+        <div class="legend">
+          <span><i style="background:rgba(255,255,255,.4)"></i> Industry median</span>
+          <span><i style="background:#22c55e"></i> Best practice</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="focus-cards">
+      <div class="focus-card strong">
+        <h4>You're strong here</h4><div id="strongList"></div>
+      </div>
+      <div class="focus-card weak">
+        <h4>Focus your investment here</h4><div id="weakList"></div>
+      </div>
+    </div>
+
+    <div class="card recommend" style="margin-bottom:14px">
+      <h3>Recommended next steps</h3>
+      <ul id="recommendList"></ul>
+    </div>
+
+    <div class="cta">
+      <div>
+        <h3>Ready to close the gap?</h3>
+        <p>Tezo will turn this assessment into a prioritised data &amp; AI roadmap. Share your report to start the conversation.</p>
+      </div>
+      <div class="cta-actions">
+        <button class="btn-light" id="downloadPdfBtn">⬇ Download PDF</button>
+        <a class="btn-outline-light" href="#" id="contactBtn">✉ Email Sales@tezo.com</a>
+        <button class="btn-outline-light" id="restartBtn">↺ Retake</button>
+      </div>
+    </div>
+
+    <div class="footer">© <span id="yr"></span> Tezo · AI Readiness Advisor · Benchmarks reflect cross-industry data leadership research.</div>
+  </section>
+
+  <div id="pdfStage" aria-hidden="true"></div>
+</div>
+
+<script>
+/* ============================================================
+   TEZO — AI Readiness Advisor (no-scroll bot edition)
+   12 questions · 8 domains · single-stage swap
+   ============================================================ */
+
+const DOMAINS = [
+  {id:1, name:"Data Organization & Structure",   weight:0.15, benchmark:42, best:80},
+  {id:2, name:"Data Quality & Cleanliness",      weight:0.18, benchmark:48, best:80},
+  {id:3, name:"Data Integration & Pipelines",    weight:0.13, benchmark:51, best:80},
+  {id:4, name:"Data Governance & Stewardship",   weight:0.14, benchmark:39, best:80},
+  {id:5, name:"Access, Controls & Security",     weight:0.12, benchmark:56, best:80},
+  {id:6, name:"Data Consumption & Accessibility",weight:0.10, benchmark:44, best:80},
+  {id:7, name:"Data Architecture & Platform",    weight:0.10, benchmark:53, best:80},
+  {id:8, name:"AI-Specific Readiness",           weight:0.08, benchmark:40, best:80}
+];
+
+const QUESTIONS = [
+  {d:1,c:"Q1",q:"How structured, catalogued, and consistently defined is your enterprise data?",info:[
+    "Fragmented silos, no common schema; <10% catalogued; every team defines key terms differently.",
+    "Some integration with competing schemas; 10-30% catalogued; definitions reconciled manually.",
+    "Partial canonical model for major domains; 30-60% catalogued with basic metadata.",
+    "Conformed model across most systems; 60-85% catalogued; definitions standardised in reporting.",
+    "Fully harmonised governed schema; 85%+ catalogued with lineage; semantic layer enforces definitions."
+  ]},
+  {d:1,c:"Q2",q:"How AI-retrievable are your unstructured documents (PDFs, emails, contracts)?",info:[
+    "Unorganised, scattered across drives.",
+    "Stored in document repositories with basic folder structure.",
+    "Tagged with basic metadata in a document management system.",
+    "Classified, tagged, and indexed for retrieval.",
+    "Fully chunked, embedded, and AI-retrievable for RAG/agents."
+  ]},
+  {d:2,c:"Q3",q:"How clean and complete is your critical data (duplicates, missing fields)?",info:[
+    "Duplicate rate >25% or unknown; key fields <60% complete.",
+    "Duplicates 15-25%; completeness 60-75% with visible gaps.",
+    "Duplicates 5-15%; completeness 75-85% — workable but inconsistent.",
+    "Duplicates <5%, actively monitored; completeness 85-95% with automated fills.",
+    "Duplicates <2% with automated dedup; completeness >95%, measured and enforced."
+  ]},
+  {d:2,c:"Q4",q:"How current is your data, and how are quality issues monitored & remediated?",info:[
+    "Days/weeks old; freshness unknown; issues found when reports break.",
+    "Daily batch with variable lag; issues spotted ad hoc by business teams.",
+    "Daily refresh with SLAs; quarterly quality measurement during audits.",
+    "Sub-hour refreshes for critical data; monthly KPIs with active remediation.",
+    "Real-time/streaming; real-time monitoring with automated alerts and SLAs at source."
+  ]},
+  {d:3,c:"Q5",q:"How modern, reliable, and API-accessible are your data pipelines (integration + DataOps)?",info:[
+    "Manual exports/ad hoc transfers; >15% failures; no APIs; no version control.",
+    "Scheduled batch ETL with brittle dependencies; 8-15% failures; few APIs.",
+    "Modern ETL/ELT with some automation; 3-8% failures; inconsistent APIs; some CI/CD.",
+    "Event-driven + batch with monitoring; <3% failures; most systems API-accessible under full CI/CD.",
+    "Real-time streaming with DataOps; <1% failures and self-healing; API-first with semantic data products."
+  ]},
+  {d:4,c:"Q6",q:"How mature is your data stewardship, governance, and policy enforcement?",info:[
+    "No stewardship; governance on paper only; few/no documented policies.",
+    "Informal owners; council rarely meets; policies exist but unenforced.",
+    "Stewards named for 1-2 domains; council with informal authority; policies partially enforced.",
+    "Stewards with RACI; council with formal authority and metrics; policies enforced with automated controls.",
+    "Federated governance embedded in domains; fully automated policy enforcement with audit trail."
+  ]},
+  {d:4,c:"Q7",q:"Can you trace lineage end-to-end, including AI-specific policies (training data, model lineage)?",info:[
+    "No lineage; no AI-specific policies.",
+    "Manual lineage docs; draft AI policies under development.",
+    "Partial automated lineage; basic AI policies adopted but not enforced.",
+    "Lineage for most outputs; AI policies adopted with active monitoring.",
+    "End-to-end automated lineage with impact analysis; comprehensive AI policies with automated enforcement."
+  ]},
+  {d:5,c:"Q8",q:"How fine-grained are your access controls — for sensitive data AND AI workloads?",info:[
+    "System-level broad permissions; sensitive data unclassified; AI bypasses controls; no audit logging.",
+    "Role-based at system level; partial classification; AI uses broad service accounts; sparse logging.",
+    "Role-based at table level with reviews; sensitive data classified; some AI workloads scoped.",
+    "Attribute-based with row/column controls; classified with automated masking; AI with role-based scoped access and anomaly detection.",
+    "Fine-grained policy-driven access with full audit; automated classification/encryption; AI gateway and compliance-grade audit trails."
+  ]},
+  {d:6,c:"Q9",q:"How easily can business users AND AI agents consume governed data (semantic layer + data products + catalog)?",info:[
+    "IT-built static reports only; raw table access; not discoverable.",
+    "Reports plus some self-service; mostly raw tables; partially discoverable via wiki.",
+    "Self-service BI on curated datasets; data products in 1-2 domains; catalog with limited use.",
+    "Self-service across most domains; data products for most needs; catalog used by most users.",
+    "Full self-service with semantic layer; data product mesh with SLAs; active catalog with usage analytics."
+  ]},
+  {d:7,c:"Q10",q:"How modern and AI-fit is your data platform (cloud-native, vector data, ML compute, FinOps)?",info:[
+    "On-prem warehouse near end-of-life; fixed capacity; no ML compute or vector infra; no cost controls.",
+    "Mix of on-prem + early cloud; partial migration; ad hoc ML notebooks; vector data in document stores.",
+    "Cloud DW (Snowflake/BQ/Synapse); separated storage/compute for analytics; managed ML platform; basic vector storage.",
+    "Modern lakehouse with separated storage/compute across workloads; enterprise ML; vector DB in production; active FinOps.",
+    "Lakehouse + integrated vector + structured platform; full MLOps + auto-scaling + mature FinOps; purpose-built for agentic AI."
+  ]},
+  {d:8,c:"Q11",q:"Have you defined AI use cases with measurable outcomes and mapped their data requirements?",info:[
+    "Exploring AI generally; data requirements not assessed.",
+    "Use cases identified but not prioritised; data needs discussed, undocumented.",
+    "Use cases prioritised with rough business case; high-level data requirements documented.",
+    "Use cases scoped with KPIs and success criteria; detailed data requirements documented.",
+    "Portfolio of funded use cases; each mapped to a data product with gap analysis."
+  ]},
+  {d:8,c:"Q12",q:"Have you deployed AI in production with governance (feature store, model risk, evaluation, monitoring)?",info:[
+    "None in production; no feature store; no governance framework.",
+    "Pilots attempted, none in production; ad hoc features; governance drafted but not implemented.",
+    "1-2 use cases in production; centralised feature library; basic framework adopted for some models.",
+    "Multiple use cases in production; feature store in production for ML; framework active across most workloads.",
+    "AI at scale with measured business impact; enterprise feature store; comprehensive framework with continuous monitoring."
+  ]}
+];
+
+const RATING_LABELS = ["Not at all","Initial","Developing","Established","Leading"];
+
+/* ---------- State ---------- */
+const STATE_KEY = "tezo_ai_readiness_bot_v4";
+let state = {
+  answers: new Array(QUESTIONS.length).fill(null),
+  index: -1,
+  org: {name:"", industry:"", user:"", email:""},
+  startedAt: null
+};
+try {
+  const cached = JSON.parse(localStorage.getItem(STATE_KEY) || "null");
+  if (cached && Array.isArray(cached.answers) && cached.answers.length === QUESTIONS.length) state = cached;
+} catch(e){}
+function persist(){ try{ localStorage.setItem(STATE_KEY, JSON.stringify(state)); }catch(e){} }
+
+/* ---------- DOM ---------- */
+const $ = id => document.getElementById(id);
+$("yr").textContent = new Date().getFullYear();
+const composer = $("composer");
+const scenes = {
+  intro:   $("introScene"),
+  question:$("questionScene"),
+  calc:    $("calcScene")
+};
+function escapeHtml(s){ return String(s).replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#39;"}[c])); }
+function setTopBar(pct){ $("topBar").style.width = pct + "%"; }
+
+/* ---------- Scene swap ---------- */
+let activeScene = null;
+function swapScene(name){
+  const next = scenes[name];
+  if (!next) return;
+  if (activeScene && activeScene !== next){
+    activeScene.classList.add("exiting");
+    activeScene.classList.remove("active");
+    const prior = activeScene;
+    setTimeout(()=>prior.classList.remove("exiting"), 380);
+  }
+  /* small delay so animations overlap nicely */
+  setTimeout(()=>{
+    next.classList.add("active");
+    activeScene = next;
+  }, activeScene ? 220 : 0);
+}
+
+/* ---------- Last-answer floating chip ---------- */
+function flashLastAnswer(score){
+  const host = $("lastAnswerHost");
+  host.innerHTML = "";
+  const chip = document.createElement("div");
+  chip.className = "last-answer";
+  chip.textContent = `Answer recorded — ${score} · ${RATING_LABELS[score]}`;
+  host.appendChild(chip);
+  setTimeout(()=>{ chip.remove(); }, 1700);
+}
+
+/* ---------- Intro ---------- */
+function startIntro(){
+  composer.classList.add("hidden");
+  $("summaryView").classList.remove("show");
+  setTopBar(0);
+
+  /* prefill */
+  $("f_org").value   = state.org.name || "";
+  $("f_ind").value   = state.org.industry || "";
+  $("f_name").value  = state.org.user || "";
+  $("f_email").value = state.org.email || "";
+
+  swapScene("intro");
+
+  $("startBtn").onclick = async () => {
+
+    // Validation
+    if (
+        !$("f_org").value.trim() ||
+        !$("f_ind").value ||
+        !$("f_name").value.trim() ||
+        !$("f_email").value.trim()
+    ){
+        alert("Please fill all fields.");
+        return;
+    }
+
+    state.org = {
+        name: $("f_org").value.trim(),
+        industry: $("f_ind").value,
+        user: $("f_name").value.trim(),
+        email: $("f_email").value.trim()
+    };
+
+    await submitLeadToHubspot();
+
+    state.startedAt = Date.now();
+    state.answers = new Array(QUESTIONS.length).fill(null);
+    state.index = 0;
+
+    persist();
+    askQuestion();
+};
+
+  /* Resume / view-results pill overlay */
+  const host = $("resumeHost"); host.innerHTML = "";
+  const answered = state.answers.filter(v => v !== null).length;
+  if (answered > 0 && answered < QUESTIONS.length){
+    const pill = document.createElement("div");
+    pill.className = "resume-pill";
+    pill.innerHTML = `Resume <b style="color:#fff">${answered}/${QUESTIONS.length}</b> in progress
+      <button id="resumeBtn">Resume</button>
+      <button class="ghost" id="restartBtn2">New</button>`;
+    host.appendChild(pill);
+    $("resumeBtn").onclick = () => {
+      state.index = state.answers.findIndex(v => v === null);
+      if (state.index < 0) state.index = QUESTIONS.length - 1;
+      persist();
+      askQuestion();
+    };
+    $("restartBtn2").onclick = () => { state.answers = new Array(QUESTIONS.length).fill(null); persist(); pill.remove(); };
+  } else if (answered === QUESTIONS.length){
+    const pill = document.createElement("div");
+    pill.className = "resume-pill";
+    pill.innerHTML = `Last results saved
+      <button id="viewLastBtn">View results</button>
+      <button class="ghost" id="restartBtn3">New</button>`;
+    host.appendChild(pill);
+    $("viewLastBtn").onclick = () => showSummary();
+    $("restartBtn3").onclick = () => { state.answers = new Array(QUESTIONS.length).fill(null); persist(); pill.remove(); };
+  }
+}
+
+/* ---------- Question rendering ---------- */
+function askQuestion(){
+  const i = state.index;
+  const q = QUESTIONS[i];
+  const dom = DOMAINS.find(d => d.id === q.d);
+
+  $("qBubble").innerHTML = `
+    <span class="qtag"><span class="dot"></span> Q${i+1} of ${QUESTIONS.length} · ${escapeHtml(dom.name)}</span>
+    <div class="qbody">${escapeHtml(q.q)}</div>
+    <div class="q-hint">Pick the level that best matches today — auto-advances after you tap.</div>
+  `;
+
+  swapScene("question");
+  setTopBar(Math.round((i / QUESTIONS.length) * 100));
+  renderComposer();
+}
+
+function renderComposer(){
+  const i = state.index;
+  const q = QUESTIONS[i];
+  composer.classList.remove("hidden");
+  $("composerLabel").textContent = `Tap your score — auto-advances`;
+  $("infoToggle").textContent = "ⓘ What do these levels mean?";
+  $("optDetails").classList.remove("open");
+
+  const bar = $("ratingBar");
+  bar.innerHTML = "";
+  for (let s=0; s<=4; s++){
+    const b = document.createElement("button");
+    b.type = "button";
+    b.className = state.answers[i] === s ? "active" : "";
+    b.innerHTML = `${s}<span class="lab">${RATING_LABELS[s]}</span>`;
+    b.addEventListener("click", () => choose(s));
+    bar.appendChild(b);
+  }
+
+  const list = $("optDetailsList");
+  list.innerHTML = "";
+  q.info.forEach((txt, idx) => {
+    const li = document.createElement("li");
+    li.innerHTML = `<b class="num">${idx}</b><span><b class="lvl">${RATING_LABELS[idx]}</b> — ${escapeHtml(txt)}</span>`;
+    list.appendChild(li);
+  });
+
+  $("backBtn").disabled = i === 0;
+}
+
+$("infoToggle").addEventListener("click", () => {
+  const p = $("optDetails");
+  const open = p.classList.toggle("open");
+  $("infoToggle").textContent = open ? "× Hide level details" : "ⓘ What do these levels mean?";
+});
+
+$("backBtn").addEventListener("click", () => {
+  if (state.index > 0){
+    state.index--;
+    state.answers[state.index] = null;
+    persist();
+    askQuestion();
+  }
+});
+
+function choose(score){
+  const i = state.index;
+  state.answers[i] = score;
+  persist();
+  document.querySelectorAll("#ratingBar button").forEach((el, idx) => el.classList.toggle("active", idx === score));
+
+  flashLastAnswer(score);
+
+  setTimeout(() => {
+    if (state.index < QUESTIONS.length - 1){
+      state.index++;
+      persist();
+      askQuestion();
+    } else {
+      composer.classList.add("hidden");
+      setTopBar(100);
+      swapScene("calc");
+      setTimeout(showSummary, 1100);
+    }
+  }, 380);
+}
+
+/* ---------- Scoring ---------- */
+function computeDomainScore(dId){
+  const qIdxs = QUESTIONS.map((q,i)=>q.d===dId?i:-1).filter(i=>i>=0);
+  const answered = qIdxs.map(i => state.answers[i]).filter(v => v !== null);
+  if (!answered.length) return 0;
+  const avg = answered.reduce((a,b)=>a+b,0) / answered.length;
+  return Math.round(avg * 25);
+}
+function computeOverall(){
+  return Math.round(DOMAINS.reduce((sum, d) => sum + computeDomainScore(d.id) * d.weight, 0));
+}
+function verdictFor(score){
+  if (score >= 80) return {label:"AI-Leading",       color:"#22c55e", line:"Your data foundations are strong enough to deploy AI at scale."};
+  if (score >= 65) return {label:"AI-Ready",         color:"#22d3ee", line:"You are positioned for confident AI rollouts with targeted improvements."};
+  if (score >= 50) return {label:"AI-Capable",       color:"#3b82f6", line:"Solid groundwork in place — close key gaps before scaling AI."};
+  if (score >= 35) return {label:"AI-Aspiring",      color:"#f59e0b", line:"Foundational work needed before AI use cases will succeed reliably."};
+  return            {label:"AI-Foundational",  color:"#ef4444", line:"Significant data foundation work required before AI delivers value."};
+}
+
+/* ---------- Summary ---------- */
+let radarChartInstance = null;
+function showSummary(){
+  composer.classList.add("hidden");
+  /* hide all stage scenes */
+  Object.values(scenes).forEach(s => s.classList.remove("active"));
+  activeScene = null;
+  $("summaryView").classList.add("show");
+  $("summaryView").scrollTop = 0;
+  /* allow body scroll only inside summary */
+  document.body.style.overflow = "hidden"; /* summary has its own scroll */
+
+  const overall = computeOverall();
+  $("overallScore").textContent = overall;
+  const verdict = verdictFor(overall);
+  const pill = $("verdictPill");
+  pill.textContent = verdict.label;
+  pill.style.background = verdict.color;
+  pill.style.color = "#0a0d24";
+  $("verdictLine").textContent = verdict.line;
+  /* org line — only show what's provided, no fallback */
+  const orgLine = [state.org.name, state.org.industry].filter(Boolean).join(" · ");
+  $("summaryOrg").textContent = orgLine;
+  $("summaryOrg").style.display = orgLine ? "block" : "none";
+
+  const ring = $("scoreCircle");
+  const deg = (overall/100) * 360;
+  ring.style.background = `conic-gradient(${verdict.color} ${deg}deg, rgba(255,255,255,.10) ${deg}deg)`;
+
+  const domainData = DOMAINS.map(d => ({...d, score: computeDomainScore(d.id)}));
+
+  const ctx = document.getElementById("radarChart").getContext("2d");
+  if (radarChartInstance) radarChartInstance.destroy();
+  radarChartInstance = new Chart(ctx, {
+    type: "radar",
+    data: {
+      labels: domainData.map(d => d.name.replace(" & ","\n& ")),
+      datasets: [
+        { label:"Your score", data:domainData.map(d=>d.score), backgroundColor:"rgba(139,92,246,.20)", borderColor:"#8b5cf6", borderWidth:2, pointBackgroundColor:"#8b5cf6" },
+        { label:"Industry median", data:domainData.map(d=>d.benchmark), backgroundColor:"rgba(245,158,11,.10)", borderColor:"#f59e0b", borderWidth:1.5, borderDash:[6,4], pointBackgroundColor:"#f59e0b" },
+        { label:"Best practice", data:domainData.map(d=>d.best), backgroundColor:"rgba(34,197,94,.08)", borderColor:"#22c55e", borderWidth:1.5, borderDash:[2,3], pointBackgroundColor:"#22c55e" }
+      ]
+    },
+    options:{
+      responsive:true,
+      plugins:{ legend:{display:false} },
+      scales:{ r:{ suggestedMin:0, suggestedMax:100, ticks:{stepSize:20, color:"#8a92b2", backdropColor:"transparent",font:{size:9}}, grid:{color:"rgba(255,255,255,.08)"}, angleLines:{color:"rgba(255,255,255,.08)"}, pointLabels:{font:{size:10, weight:"600"}, color:"#fff"} } }
+    }
+  });
+
+  const bars = $("domainBars");
+  bars.innerHTML = "";
+  domainData.forEach(d => {
+    const row = document.createElement("div");
+    row.className = "domain-row";
+    row.innerHTML = `
+      <div class="domain-name">${d.id}. ${d.name}</div>
+      <div class="domain-bar">
+        <div class="fill" style="width:${d.score}%"></div>
+        <div class="marker" style="left:${d.benchmark}%" title="Industry median ${d.benchmark}"></div>
+        <div class="marker best" style="left:${d.best}%" title="Best practice ${d.best}"></div>
+      </div>
+      <div class="domain-stats"><b>${d.score}</b>/100<br><span>med ${d.benchmark} · best ${d.best}</span></div>
+    `;
+    bars.appendChild(row);
+  });
+
+  const sorted = [...domainData].sort((a,b) => b.score - a.score);
+  const strong = sorted.slice(0,3).filter(d => d.score >= d.benchmark);
+  const weak   = [...domainData].sort((a,b) => (a.score - a.benchmark) - (b.score - b.benchmark)).slice(0,3);
+  const strongList = $("strongList"); strongList.innerHTML = "";
+  if (!strong.length) strongList.innerHTML = `<div class="empty">All domains are below the industry median — focus broadly on foundations.</div>`;
+  strong.forEach(d => strongList.insertAdjacentHTML("beforeend", `<div class="focus-item"><div class="name">${escapeHtml(d.name)}</div><div class="score">${d.score} vs ${d.benchmark}</div></div>`));
+  const weakList = $("weakList"); weakList.innerHTML = "";
+  weak.forEach(d => weakList.insertAdjacentHTML("beforeend", `<div class="focus-item"><div class="name">${escapeHtml(d.name)}</div><div class="score">${d.score} vs ${d.benchmark}</div></div>`));
+
+  const recs = generateRecommendations(domainData);
+  const rec = $("recommendList"); rec.innerHTML = "";
+  recs.forEach(r => { const li = document.createElement("li"); li.textContent = r; rec.appendChild(li); });
+
+  const orgForMail = state.org.name || "(no organization given)";
+  const subject = encodeURIComponent(`AI Readiness Assessment — ${orgForMail} — ${overall}/100`);
+  const body = encodeURIComponent(
+`Hi Tezo team,
+
+Sharing my organization's AI Data Readiness assessment results for a follow-up.
+
+Organization: ${state.org.name || ""}
+Industry: ${state.org.industry || ""}
+Contact: ${state.org.user || ""} (${state.org.email || ""})
+
+Overall readiness: ${overall}/100 (${verdict.label})
+
+Domain scores:
+${domainData.map(d => `  ${d.id}. ${d.name}: ${d.score}/100 (median ${d.benchmark}, best ${d.best})`).join("\n")}
+
+Please reach out to schedule a deep-dive.
+
+Thanks.`);
+  $("contactBtn").setAttribute("href", `mailto:Sales@tezo.com?subject=${subject}&body=${body}`);
+}
+
+function generateRecommendations(domainData){
+  const out = [];
+  const weak = [...domainData].sort((a,b) => a.score - b.score).slice(0,3);
+  const REC_LIB = {
+    1: "Stand up a single business glossary and canonical model for your top 2 domains (customer + product) — every downstream AI use case depends on this.",
+    2: "Instrument data quality KPIs (completeness, duplicates, freshness) on AI-relevant tables and route alerts to stewards with SLA-bound remediation.",
+    3: "Adopt CI/CD for pipelines, automated lineage, and reusable connector patterns to cut new-source onboarding from weeks to days.",
+    4: "Appoint named stewards per domain with documented RACI, an empowered governance council, and AI-specific policies for training data and model lineage.",
+    5: "Deploy fine-grained, attribute-based access for AI workloads, sensitive data classification with masking, and a sanctioned AI gateway with content controls.",
+    6: "Publish governed data products with a semantic layer so AI agents consume curated, contract-backed data rather than raw tables.",
+    7: "Move to a modern lakehouse with separated storage/compute, vector data infrastructure, and a FinOps practice to control AI workload spend.",
+    8: "Codify your AI use-case portfolio with measurable outcomes, map each use case to required data products, and operationalize a feature store and AI governance framework."
+  };
+  weak.forEach(d => out.push(REC_LIB[d.id]));
+  if (domainData.every(d => d.score >= 65)){
+    out.push("You are in the top quartile — focus on scaling AI use cases, automating governance, and embedding feature stores across structured and unstructured data.");
+  } else {
+    out.push("Translate this assessment into a 90-day roadmap with concrete owners, KPIs, and a Tezo-led architecture review on the weakest domain.");
+  }
+  return out;
+}
+
+/* ---------- PDF ---------- */
+$("downloadPdfBtn")?.addEventListener("click", async () => {
+  const overall = computeOverall();
+  const verdict = verdictFor(overall);
+  const domainData = DOMAINS.map(d => ({ ...d, score: computeDomainScore(d.id) }));
+  const orgLabel = [state.org.name, state.org.industry].filter(Boolean).join(" · ") || "Assessment Report";
+
+  const stage = $("pdfStage");
+  stage.innerHTML = `
+    <h1>TEZO — AI Readiness Advisor</h1>
+    <div class="pdf-sub">Data Readiness for AI · Enterprise Assessment · ${new Date().toLocaleDateString()}</div>
+    <div class="pdf-hero">
+      <div>
+        <div style="font-size:13px;color:#d6d8ee">${escapeHtml(orgLabel)}</div>
+        <div style="font-size:18px;font-weight:700;margin-top:4px">Overall Readiness</div>
+        <div style="font-size:11px;color:#d6d8ee;margin-top:4px">${escapeHtml(verdict.line)}</div>
+      </div>
+      <div style="text-align:right">
+        <div class="big">${overall}<span style="font-size:14px;opacity:.7">/100</span></div>
+        <div style="background:${verdict.color};color:#0a0d24;display:inline-block;padding:4px 12px;border-radius:99px;font-size:11px;font-weight:800;margin-top:4px">${verdict.label}</div>
+      </div>
+    </div>
+
+    <div style="margin-top:16px">
+      <h3 style="margin:0 0 6px;font-size:14px;color:#3b1f74">Domain readiness</h3>
+      <table>
+        <thead><tr><th>#</th><th>Domain</th><th>Your score</th><th>Industry median</th><th>Best practice</th><th>Gap</th></tr></thead>
+        <tbody>
+          ${domainData.map(d => `
+            <tr>
+              <td>${d.id}</td><td>${escapeHtml(d.name)}</td>
+              <td><b>${d.score}</b>/100</td>
+              <td>${d.benchmark}</td><td>${d.best}</td>
+              <td style="color:${d.score>=d.benchmark?'#1a8f5a':'#b94545'}">${d.score-d.benchmark>=0?'+':''}${d.score-d.benchmark}</td>
+            </tr>`).join("")}
+        </tbody>
+      </table>
+    </div>
+
+    <div style="margin-top:14px">
+      <h3 style="margin:0 0 6px;font-size:14px;color:#3b1f74">Where to focus</h3>
+      <ul style="margin:0;padding-left:18px;font-size:12px;line-height:1.6">
+        ${generateRecommendations(domainData).map(r=>`<li>${escapeHtml(r)}</li>`).join("")}
+      </ul>
+    </div>
+
+    <div style="margin-top:14px;font-size:11px;color:#5b6b85">
+      Prepared for: ${escapeHtml(state.org.user || "")} ${state.org.email ? "&lt;"+escapeHtml(state.org.email)+"&gt;" : ""}<br>
+      To discuss your roadmap, reach Tezo at <b>Sales@tezo.com</b>.
+    </div>
+  `;
+
+  try {
+    const canvas = await html2canvas(stage, {scale:2, backgroundColor:"#ffffff", useCORS:true});
+    const imgData = canvas.toDataURL("image/png");
+    const { jsPDF } = window.jspdf;
+    const pdf = new jsPDF({orientation:"portrait", unit:"pt", format:"a4"});
+    const pageW = pdf.internal.pageSize.getWidth();
+    const pageH = pdf.internal.pageSize.getHeight();
+    const imgW = pageW - 40;
+    const imgH = canvas.height * (imgW / canvas.width);
+    if (imgH <= pageH - 40){
+      pdf.addImage(imgData, "PNG", 20, 20, imgW, imgH);
+    } else {
+      const pageCanvasH = (pageH - 40) * (canvas.width / imgW);
+      let sY = 0;
+      while (sY < canvas.height){
+        const sliceH = Math.min(pageCanvasH, canvas.height - sY);
+        const c2 = document.createElement("canvas");
+        c2.width = canvas.width; c2.height = sliceH;
+        c2.getContext("2d").drawImage(canvas, 0, sY, canvas.width, sliceH, 0, 0, canvas.width, sliceH);
+        pdf.addImage(c2.toDataURL("image/png"), "PNG", 20, 20, imgW, sliceH * (imgW / canvas.width));
+        sY += sliceH;
+        if (sY < canvas.height) pdf.addPage();
+      }
+    }
+    const fname = `Tezo-AI-Readiness_${(state.org.name||"Report").replace(/\s+/g,"_")}.pdf`;
+    pdf.save(fname);
+  } catch(e){
+    console.error(e);
+    alert("Sorry, could not generate PDF. Please try again.");
+  }
+});
+
+$("restartBtn")?.addEventListener("click", () => {
+  if (!confirm("Start a new assessment? Your current answers will be cleared.")) return;
+  state = { answers: new Array(QUESTIONS.length).fill(null), index: -1, org: state.org, startedAt:null };
+  persist();
+  $("summaryView").classList.remove("show");
+  setTopBar(0);
+  startIntro();
+});
+
+async function submitLeadToHubspot() {
+
+    const payload = {
+        fields: [
+            {
+                name: "organization",
+                value: document.getElementById("f_org").value.trim()
+            },
+            {
+                name: "industryai",
+                value: document.getElementById("f_ind").value
+            },
+            {
+                name: "firstname",
+                value: document.getElementById("f_name").value.trim()
+            },
+            {
+                name: "email",
+                value: document.getElementById("f_email").value.trim()
+            }
+        ]
+    };
+
+    try {
+        await fetch(
+            "https://api.hsforms.com/submissions/v3/integration/submit/242046967/062bc672-d3a3-4d56-a8d4-c2b846cfbd34",
+            {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify(payload)
+            }
+        );
+
+        console.log("HubSpot lead submitted");
+
+    } catch (err) {
+        console.error("HubSpot submission failed", err);
+    }
+}
+
+window.addEventListener("DOMContentLoaded", startIntro);
+</script>
+</body>
+</html>
