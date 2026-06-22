@@ -3,10 +3,10 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>Tezo Quality Engineering · Don't let quality slow down your business speed</title>
+<title>Tezo Quality Engineering · Don't let quality slow your business down</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Inter:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,400&display=swap" rel="stylesheet">
 <style>
   :root {
     --primary:   #e54a59;
@@ -44,7 +44,7 @@
     display: inline-flex; align-items: center; justify-content: center;
     margin-bottom: 18px;
   }
-  .chip.amber  { background: rgba(255,255,255,0.15); color: var(--primary); }
+  .chip.amber  { background: rgba(229,74,89,0.14); color: var(--primary); }
   .chip.persona { background: var(--accent); color: var(--secondary); transition: background 0.4s, color 0.4s; }
 
   /* Header */
@@ -56,17 +56,17 @@
     backdrop-filter: blur(12px);
   }
   .nav { display: flex; align-items: center; justify-content: space-between; gap: 32px; }
-  .logo-img { height: 36px; width: auto; display: block; }
-  .logo-fallback {
-    font-family: 'Inter', sans-serif;
-    font-weight: 700; font-size: 20px; letter-spacing: -0.02em; color: var(--text);
+  .logo-mark {
+    font-weight: 700; font-size: 22px; letter-spacing: -0.03em; color: var(--text);
+    text-decoration: none; display: inline-flex; align-items: baseline;
   }
-  .logo-fallback .accent { color: var(--primary); }
-  .nav-meta { font-size: 11px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.14em; }
+  .logo-mark .slash { color: var(--primary); margin: 0 1px; }
+  .logo-mark .sub { color: var(--accent); font-weight: 600; }
   .nav-cta {
     background: var(--primary); color: #fff;
     padding: 10px 20px; border-radius: 6px;
-    font-size: 13px; font-weight: 600; text-decoration: none;
+    font-size: 13px; font-weight: 600; text-decoration: none; border: none; cursor: pointer;
+    font-family: inherit;
     transition: filter 0.2s, transform 0.15s;
   }
   .nav-cta:hover { filter: brightness(1.1); transform: translateY(-1px); }
@@ -88,6 +88,41 @@
   }
   .role-pill:hover { color: var(--text); border-color: rgba(176,168,254,0.4); }
   .role-pill.active { background: var(--primary); color: #fff; border-color: var(--primary); }
+
+  /* Sticky side switcher */
+  .side-switch {
+    position: fixed; top: 50%; right: 0; transform: translateY(-50%) translateX(60px);
+    z-index: 45; display: flex; flex-direction: row; align-items: stretch;
+    background: transparent;
+    border: none; border-radius: 0; padding: 0;
+    opacity: 0; pointer-events: none; transition: opacity 0.35s, transform 0.35s;
+    box-shadow: none;
+  }
+  .side-switch.show { opacity: 1; pointer-events: auto; transform: translateY(-50%) translateX(0); }
+  .side-switch .ss-label {
+    writing-mode: vertical-rl; transform: rotate(180deg);
+    font-size: 10px; letter-spacing: 0.18em; text-transform: uppercase;
+    color: #fff; background: #000;
+    padding: 18px 10px; display: flex; align-items: center; justify-content: center;
+    border: 1px solid rgba(255,255,255,0.15);
+    border-right: none; white-space: nowrap;
+  }
+  .ss-pills-wrap {
+    display: flex; flex-direction: column;
+    border: 1px solid rgba(255,255,255,0.15);
+  }
+  .ss-pill {
+    border: none; border-bottom: 1px solid rgba(255,255,255,0.15); background: #000; cursor: pointer;
+    font-family: 'Inter', sans-serif; font-size: 12px; font-weight: 600;
+    color: rgba(255,255,255,0.55);
+    writing-mode: vertical-rl; transform: rotate(180deg);
+    padding: 18px 10px; transition: all 0.22s; white-space: nowrap;
+    display: flex; align-items: center; justify-content: center;
+    min-height: 80px;
+  }
+  .ss-pill:last-child { border-bottom: none; }
+  .ss-pill:hover { color: #fff; background: #111; }
+  .ss-pill.active { background: var(--primary); color: #fff; }
 
   /* Hero */
   .hero { padding: 28px 0 80px; }
@@ -123,7 +158,7 @@
   .specs .v.price { font-size: 20px; font-weight: 700; letter-spacing: -0.02em; }
   .card-cta {
     display: flex; align-items: center; justify-content: space-between;
-    background: var(--primary); color: #fff;
+    background: var(--primary); color: #fff; width: 100%; border: none; cursor: pointer; font-family: inherit;
     padding: 14px 18px; border-radius: 8px; text-decoration: none; margin-top: 18px;
     font-weight: 600; font-size: 14px; transition: filter 0.2s;
   }
@@ -131,38 +166,65 @@
   .card-cta .arrow { transition: transform 0.2s; }
   .card-cta:hover .arrow { transform: translateX(3px); }
 
-  /* Positioning band */
-  .position { background: var(--secondary); color: #fff; padding: 96px 0; }
+  /* Positioning band — What we solve */
+  .position { background: var(--secondary); color: #fff; padding: 88px 0; position: relative; overflow: hidden; }
   .position .section-eyebrow { color: var(--accent); }
   .position .thesis {
-    font-size: clamp(28px, 3.8vw, 44px); line-height: 1.2; font-weight: 400;
-    letter-spacing: -0.015em; max-width: 1100px; margin: 18px 0 40px; color: #fff;
+    font-size: clamp(30px, 4vw, 50px); line-height: 1.12; font-weight: 400;
+    letter-spacing: -0.02em; max-width: 1080px; margin: 18px 0 28px; color: #fff;
   }
   .position .thesis em { font-style: italic; color: var(--accent); }
-  .pos-points { display:grid; grid-template-columns:repeat(3,1fr); gap:1px; background: rgba(176,168,254,0.15); border:1px solid rgba(176,168,254,0.15); border-radius:12px; overflow:hidden; }
-  .pos-point { background: rgba(78,58,173,0.6); padding: 28px 26px; }
-  .pos-point .n { font-size:11px; color:var(--accent); letter-spacing:0.14em; margin-bottom:14px; }
-  .pos-point h3 { font-size:18px; font-weight:600; margin-bottom:8px; letter-spacing:-0.015em; color:#fff; }
-  .pos-point p { font-size:14px; color:rgba(176,168,254,0.8); line-height:1.6; }
-  .pos-close { font-style: italic; font-size: clamp(22px, 2.8vw, 32px); color: var(--accent); margin-top: 12px; letter-spacing: -0.01em; }
+  .pos-close {
+    font-size: clamp(28px, 4.4vw, 56px); font-weight: 800; letter-spacing: -0.03em; line-height: 1.05;
+    margin-top: 8px;
+  }
+  .unlock-line { display: inline-block; }
+  .unlock-line .w {
+    display: inline-block; opacity: 0; transform: translateY(0.5em);
+    animation: wordUp 0.6s cubic-bezier(.2,.7,.2,1) forwards;
+  }
+  .unlock-line .grad {
+    background: linear-gradient(100deg, #fff 0%, var(--accent) 30%, var(--primary) 55%, var(--accent) 80%, #fff 100%);
+    background-size: 250% 100%;
+    -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent;
+    animation: wordUp 0.6s cubic-bezier(.2,.7,.2,1) forwards, sheen 4.5s ease-in-out 0.9s infinite;
+  }
+  @keyframes wordUp { to { opacity: 1; transform: translateY(0); } }
+  @keyframes sheen { 0%,100% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } }
 
-  /* Slowdown */
-  .slowdown { padding: 96px 0; background: var(--bg); }
-  .slowdown-head { max-width: 720px; margin-bottom: 48px; }
+  /* Slowdown — the real causes */
+  .slowdown { padding: 92px 0; background: var(--bg); }
+  .slowdown-head { max-width: 760px; margin-bottom: 44px; }
   .slowdown-head h2 { font-size: clamp(28px, 3.4vw, 38px); letter-spacing: -0.03em; font-weight: 600; line-height: 1.1; margin-bottom: 14px; color: var(--text); }
   .slowdown-head p { color: var(--text-muted); font-size: 16px; line-height: 1.6; }
   .slow-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:6px; }
-  .slow-cell { background: var(--secondary); border: 1px solid rgba(176,168,254,0.18); border-radius: 12px; padding: 30px 28px; position: relative; }
-  .slow-cell .n { font-size:12px; color:var(--accent); margin-bottom:16px; letter-spacing:0.06em; }
+  .slow-cell { background: rgba(255,255,255,0.07); border: 1px solid rgba(255,255,255,0.12); border-radius: 12px; padding: 30px 28px; position: relative; backdrop-filter: blur(8px); }
+  .slow-cell .n { font-size:12px; color:rgba(255,255,255,0.5); margin-bottom:16px; letter-spacing:0.06em; }
   .slow-cell h3 { font-size:19px; font-weight:600; margin-bottom:10px; letter-spacing:-0.015em; line-height:1.2; color:#fff; }
-  .slow-cell p { font-size:14px; color:rgba(176,168,254,0.8); line-height:1.6; }
-  .slow-cell .stat { margin-top:16px; display:inline-block; font-size:11px; color:var(--accent); letter-spacing:0.06em; border-top:1px solid rgba(176,168,254,0.2); padding-top:12px; width:100%; }
+  .slow-cell p { font-size:14px; color:rgba(255,255,255,0.6); line-height:1.6; }
+  .slow-cell .stat { margin-top:16px; display:inline-block; font-size:11px; color:rgba(255,255,255,0.45); letter-spacing:0.06em; border-top:1px solid rgba(255,255,255,0.12); padding-top:12px; width:100%; }
+
+  /* AI capability */
+  .capability { padding: 92px 0; background:var(--bg-2); border-top:1px solid var(--border); border-bottom:1px solid var(--border); }
+  .cap-head-grid { display:grid; grid-template-columns: 1.1fr 0.9fr; gap:48px; align-items:end; margin-bottom:48px; }
+  .cap-head-grid h2 { font-size:clamp(28px,3.6vw,42px); letter-spacing:-0.03em; font-weight:700; line-height:1.08; color:var(--text); }
+  .cap-head-grid h2 em { font-style: normal; color: var(--accent); }
+  .cap-disclaimer { font-size:14px; color:var(--text-soft); line-height:1.6; border-left:2px solid var(--primary); padding-left:16px; }
+  .cap-disclaimer strong { color: var(--text); font-weight:600; }
+  .cap-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:6px; }
+  .cap-item { background: var(--surface); border:1px solid var(--border); border-radius:12px; padding:28px 26px; display:flex; flex-direction:column; }
+  .cap-item .where { font-size:10px; letter-spacing:0.12em; text-transform:uppercase; color:var(--primary); font-weight:600; margin-bottom:16px; display:inline-flex; align-items:center; gap:7px; }
+  .cap-item .where::before { content:""; width:6px; height:6px; border-radius:50%; background:var(--primary); }
+  .cap-item h3 { font-size:20px; font-weight:700; margin-bottom:8px; letter-spacing:-0.02em; color:var(--text); line-height:1.15; }
+  .cap-item p { font-size:14px; color:var(--text-soft); line-height:1.55; }
 
   /* Stats strip */
-  .stats { border-top: 1px solid var(--border); border-bottom: 1px solid var(--border); padding: 40px 0; display: grid; grid-template-columns: repeat(3,1fr); gap: 56px; }
+  .stats-wrap { background: var(--bg); padding: 8px 0 0; }
+  .stats { border-top: 1px solid var(--border); border-bottom: 1px solid var(--border); padding: 44px 0; display: grid; grid-template-columns: repeat(3,1fr); gap: 56px; }
   .stat-num { font-size: 42px; letter-spacing: -0.03em; font-weight: 700; color: var(--text); margin-bottom: 8px; line-height: 1; }
-  .stat-num .accent { color: #ffffff; }
+  .stat-num .accent { color: var(--accent); }
   .stat-label { font-size: 13px; color: var(--text-muted); line-height: 1.5; max-width: 280px; }
+  .figures-note { padding-top:22px; font-size:12px; color:var(--text-muted); line-height:1.5; max-width:760px; }
 
   /* Proof */
   .proof { padding: 88px 0; background: var(--bg); }
@@ -179,35 +241,38 @@
   .testimonial .quote { font-size:20px; line-height:1.45; font-style:italic; color:var(--text); }
   .testimonial .attr { margin-top:14px; font-size:12px; color:var(--text-muted); letter-spacing:0.06em; }
   .repnote { margin-top:10px; font-size:11px; color:var(--text-muted); font-style:italic; }
-  .figures-note { margin-top:22px; font-size:12px; color:var(--text-muted); line-height:1.5; max-width:760px; }
 
-  /* Timeline (how we solve it) — #9cb1e6 bg */
-  .timeline-section { padding: 96px 0; background: var(--solve-bg); border-top: 1px solid rgba(0,0,0,0.1); border-bottom: 1px solid rgba(0,0,0,0.1); }
+  /* Assessment / timeline — #9cb1e6 bg */
+  .timeline-section { padding: 92px 0; background: var(--solve-bg); border-top: 1px solid rgba(0,0,0,0.1); border-bottom: 1px solid rgba(0,0,0,0.1); }
   .timeline-section .section-eyebrow { color: #2a3a6e; }
-  .timeline-head { display:grid; grid-template-columns:1.2fr 1fr; gap:56px; margin-bottom:56px; align-items:end; }
-  .timeline-head h2 { font-size: clamp(28px,3.4vw,38px); letter-spacing:-0.03em; font-weight:600; line-height:1.1; max-width:560px; color:#0d1a3a; }
-  .timeline-head .note { font-size:15px; color:#2a3a6e; line-height:1.55; border-left:2px solid var(--secondary); padding-left:16px; }
-  .timeline-head .note .lens { font-size:11px; letter-spacing:0.14em; text-transform:uppercase; color: var(--secondary); margin-bottom:6px; display:block; font-weight:600; }
-  .timeline { position:relative; }
-  .timeline::before { content:""; position:absolute; left:120px; top:14px; bottom:14px; width:1px; background: rgba(78,58,173,0.3); }
-  .day { display:grid; grid-template-columns:112px 1fr; gap:48px; padding:24px 0; position:relative; border-bottom:1px solid rgba(78,58,173,0.15); }
-  .day:last-child { border-bottom:none; }
-  .day-marker { text-align:right; font-size:12px; font-weight:600; color:#2a3a6e; position:relative; padding-top:3px; padding-right: 10px;}
-  .day-marker::after { content:""; position:absolute; right:-13px; top:6px; width:8px; height:8px; background:var(--secondary); border-radius:50%; border:2px solid var(--solve-bg); box-shadow:0 0 0 1px var(--secondary); }
-  .day-content h3 { font-size:18px; font-weight:600; margin-bottom:6px; letter-spacing:-0.015em; color:#0d1a3a; }
-  .day-content p { color:#2a3a6e; font-size:15px; line-height:1.55; max-width:640px; }
-  .day-content .deliv { font-size:11px; color:var(--secondary); margin-top:8px; display:inline-block; letter-spacing:0.06em; font-weight:600; }
+  .timeline-head { display:grid; grid-template-columns:1.2fr 1fr; gap:56px; margin-bottom:44px; align-items:end; }
+  .timeline-head h2 { font-size: clamp(28px,3.4vw,40px); letter-spacing:-0.03em; font-weight:700; line-height:1.08; max-width:560px; color:#0d1a3a; }
+  .timeline-head .note { font-size:14px; color:#2a3a6e; line-height:1.55; border-left:2px solid var(--secondary); padding-left:16px; }
+  .timeline-head .note .lens { font-size:11px; letter-spacing:0.14em; text-transform:uppercase; color: var(--secondary); margin-bottom:6px; display:block; font-weight:700; }
+  /* progressive disclosure accordion */
+  .pd { border-top:1px solid rgba(78,58,173,0.22); }
+  .pd-item { border-bottom:1px solid rgba(78,58,173,0.22); }
+  .pd-head { width:100%; display:grid; grid-template-columns:130px 1fr auto; gap:24px; align-items:center;
+    background:none; border:none; cursor:pointer; text-align:left; padding:20px 4px; font-family:inherit; color:#0d1a3a; }
+  .pd-when { font-size:12px; font-weight:700; letter-spacing:0.04em; color:var(--secondary); }
+  .pd-title { font-size:18px; font-weight:600; letter-spacing:-0.015em; color:#0d1a3a; }
+  .pd-toggle { width:26px; height:26px; border-radius:50%; border:1px solid rgba(78,58,173,0.4); display:flex; align-items:center; justify-content:center; color:var(--secondary); transition:transform 0.3s, background 0.2s; flex-shrink:0; }
+  .pd-toggle svg { width:14px; height:14px; }
+  .pd-item.open .pd-toggle { transform:rotate(45deg); background:var(--secondary); color:#fff; border-color:var(--secondary); }
+  .pd-body { max-height:0; overflow:hidden; transition:max-height 0.4s ease; }
+  .pd-body-inner { padding:0 4px 22px 154px; }
+  .pd-body-inner p { color:#2a3a6e; font-size:15px; line-height:1.55; max-width:680px; }
+  .pd-body-inner .deliv { font-size:11px; color:var(--secondary); margin-top:10px; display:inline-block; letter-spacing:0.06em; font-weight:700; text-transform:uppercase; }
 
-  /* Deliverables — also #9cb1e6 bg, cards #ABC0F3 */
-  .deliverables { padding: 84px 0; background: var(--solve-bg); border-top: 1px solid rgba(0,0,0,0.08); border-bottom: 1px solid rgba(0,0,0,0.08); }
-  .deliverables-head { max-width:720px; margin-bottom:40px; }
-  .deliverables-head .section-eyebrow { color:#2a3a6e; }
-  .deliverables-head h2 { font-size:clamp(28px,3.4vw,38px); letter-spacing:-0.03em; font-weight:600; line-height:1.12; color:#0d1a3a; }
+  /* Deliverables — compact */
+  .deliverables { padding: 80px 0; background: var(--solve-bg); border-top: 1px solid rgba(0,0,0,0.08); border-bottom: 1px solid rgba(0,0,0,0.08); }
+  .deliverables-head { max-width:760px; margin-bottom:32px; }
+  .deliverables-head h2 { font-size:clamp(28px,3.4vw,40px); letter-spacing:-0.03em; font-weight:700; line-height:1.1; color:#0d1a3a; }
   .deliv-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:6px; }
-  .deliv-cell { background: var(--solve-card); border:1px solid rgba(78,58,173,0.15); border-radius:12px; padding:28px 26px; }
-  .deliv-cell .num { font-size:12px; color:var(--secondary); margin-bottom:14px; font-weight:600; }
-  .deliv-cell h3 { font-size:18px; font-weight:600; margin-bottom:10px; letter-spacing:-0.015em; color:#0d1a3a; }
-  .deliv-cell p { font-size:14px; color:#2a3a6e; line-height:1.6; }
+  .deliv-cell { background: var(--solve-card); border:1px solid rgba(78,58,173,0.15); border-radius:12px; padding:22px 22px; }
+  .deliv-cell .num { font-size:12px; color:var(--secondary); margin-bottom:10px; font-weight:700; }
+  .deliv-cell h3 { font-size:17px; font-weight:700; margin-bottom:7px; letter-spacing:-0.015em; color:#0d1a3a; }
+  .deliv-cell p { font-size:13px; color:#2a3a6e; line-height:1.5; }
 
   /* Ladder */
   .ladder-section { padding: 88px 0; background: var(--bg); }
@@ -219,7 +284,7 @@
   .step { background: var(--surface); border:1px solid var(--border); padding:24px 22px; border-radius:10px; position:relative; }
   .step.featured { background: var(--secondary); color:#fff; border-color:var(--secondary); }
   .step.featured .step-label { color:var(--accent); }
-  .step.featured .step-desc { color:rgba(176,168,254,0.75); }
+  .step.featured .step-desc { color:rgba(176,168,254,0.78); }
   .step.featured::before { content:"you start here"; position:absolute; top:-10px; right:16px; background: var(--primary); color:#fff; padding:3px 10px; font-size:10px; border-radius:999px; letter-spacing:0.08em; text-transform:uppercase; font-weight:600; }
   .step-num { font-size:12px; color:var(--primary); margin-bottom:14px; font-weight:600; }
   .step.featured .step-num { color:var(--accent); }
@@ -228,58 +293,64 @@
   .step.featured .step-title { color:#fff; }
   .step-desc { font-size:13px; color:var(--text-muted); line-height:1.5; }
 
-  /* Who we are — secondary bg */
-  .who { padding: 96px 0; background: var(--secondary); border-top:1px solid rgba(176,168,254,0.15); }
-  .who .section-eyebrow { color:var(--accent); opacity:0.85; }
-  .who-lead { font-size: clamp(26px,3.4vw,40px); line-height:1.2; font-weight:400; letter-spacing:-0.015em; max-width:760px; margin:16px 0 52px; color:#fff; }
-  .who-lead em { font-style:italic; color:var(--accent); }
-  .who-stats { display:grid; grid-template-columns:repeat(3,1fr); gap:6px; margin-bottom:56px; border-top:1px solid rgba(176,168,254,0.2); border-bottom:1px solid rgba(176,168,254,0.2); }
-  .who-stat { padding:28px 4px 28px 0; }
-  .who-stat .v { font-size:44px; font-weight:700; letter-spacing:-0.03em; color:#ffffff; line-height:1; margin-bottom:10px; }
-  .who-stat .l { font-size:13px; color:rgba(176,168,254,0.7); line-height:1.5; max-width:240px; }
-  .who-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:48px; }
-  .who-item .chip.persona { background:var(--accent); color:var(--secondary); }
-  .who-item .n { font-size:11px; color:var(--accent); letter-spacing:0.14em; margin-bottom:14px; font-weight:600; }
-  .who-item h3 { font-size:18px; font-weight:600; margin-bottom:10px; letter-spacing:-0.015em; color:#fff; }
-  .who-item p { font-size:14px; color:rgba(176,168,254,0.75); line-height:1.6; }
-
-  /* AI capability */
-  .capability { padding: 84px 0; background:var(--bg); border-top:1px solid var(--border); }
-  .capability-head { max-width:720px; margin-bottom:44px; }
-  .capability-head h2 { font-size:clamp(26px,3.2vw,36px); letter-spacing:-0.03em; font-weight:600; line-height:1.12; margin-bottom:12px; color:var(--text); }
-  .capability-head p { color:var(--text-muted); font-size:16px; line-height:1.6; }
-  .cap-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:28px; }
-  .cap-item h3 { font-size:18px; font-weight:600; margin-bottom:8px; letter-spacing:-0.015em; color:var(--text); }
-  .cap-item p { font-size:14px; color:var(--text-soft); line-height:1.6; }
-  .cap-item .where { margin-top:12px; font-size:11px; color:var(--primary); letter-spacing:0.04em; font-weight:500; }
-
-  /* Insights */
-  .insights { padding: 88px 0; background:var(--bg); border-top:1px solid var(--border); }
-  .insights-head { margin-bottom:40px; max-width:720px; }
-  .insights-head h2 { font-size:clamp(26px,3.2vw,36px); letter-spacing:-0.03em; font-weight:600; line-height:1.12; margin-bottom:12px; color:var(--text); }
+  /* Insights & tools — asymmetric hierarchy */
+  .insights { padding: 92px 0; background:var(--bg); border-top:1px solid var(--border); }
+  .insights-head { margin-bottom:36px; max-width:760px; }
+  .insights-head h2 { font-size:clamp(26px,3.2vw,38px); letter-spacing:-0.03em; font-weight:700; line-height:1.1; margin-bottom:12px; color:var(--text); }
   .insights-head p { color:var(--text-muted); font-size:16px; line-height:1.6; }
-  .insight-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:6px; }
-  .insight-card { background: var(--secondary); border:1px solid rgba(176,168,254,0.2); border-radius:12px; padding:28px 26px; display:flex; flex-direction:column; }
-  .insight-tag { font-size:11px; color:var(--accent); letter-spacing:0.12em; text-transform:uppercase; margin-bottom:16px; font-weight:500; }
-  .insight-card h3 { font-size:19px; font-weight:600; margin-bottom:10px; letter-spacing:-0.015em; line-height:1.2; color:#fff; }
-  .insight-card p { font-size:14px; color:rgba(176,168,254,0.75); line-height:1.6; flex:1; }
-  .insight-foot { margin-top:20px; }
-  .insight-link { font-size:14px; font-weight:500; color:var(--accent); text-decoration:none; display:inline-flex; align-items:center; gap:8px; border-bottom:1px solid rgba(176,168,254,0.35); padding-bottom:2px; transition:border-color 0.2s; }
-  .insight-link:hover { border-color:var(--accent); }
-  .insight-link .arrow { transition:transform 0.2s; }
-  .insight-link:hover .arrow { transform:translateX(3px); }
-  .insight-soon { font-size:11px; color:var(--text-muted); letter-spacing:0.1em; text-transform:uppercase; display:inline-flex; align-items:center; gap:8px; }
-  .insight-soon::before { content:""; width:7px; height:7px; border-radius:50%; background:var(--primary); }
+  .res-stack { display:flex; flex-direction:column; gap:14px; }
+  .res-row { display:grid; gap:14px; }
+  .res-row.two { grid-template-columns:1fr 1fr; }
+  .asset { position:relative; text-decoration:none; border-radius:16px; border:1px solid var(--border); display:block;
+    transition:transform 0.2s, border-color 0.2s, box-shadow 0.2s; overflow:hidden; }
+  .asset:hover { transform:translateY(-3px); border-color:rgba(176,168,254,0.4); box-shadow:0 16px 40px rgba(0,0,0,0.35); }
+  .asset .kicker { font-size:10px; letter-spacing:0.14em; text-transform:uppercase; font-weight:600; margin-bottom:14px; display:inline-flex; align-items:center; gap:8px; }
+  .asset h3 { letter-spacing:-0.02em; font-weight:700; color:#fff; }
+  .asset p { line-height:1.55; }
+  .asset .go { margin-top:auto; padding-top:18px; font-size:13px; font-weight:600; display:inline-flex; align-items:center; gap:8px; }
+  .asset .go .arrow { transition:transform 0.2s; }
+  .asset:hover .go .arrow { transform:translateX(4px); }
+
+  /* Featured interactive asset */
+  .asset.feature { background:linear-gradient(120deg, var(--secondary) 0%, #5a3f8f 55%, #7a3f6e 100%); padding:40px; display:grid; grid-template-columns:1.4fr 1fr; gap:32px; align-items:center; }
+  .asset.feature::before { content:""; position:absolute; top:0; left:0; right:0; height:3px; background:var(--primary); }
+  .asset.feature .kicker { color:var(--accent); }
+  .asset.feature h3 { font-size:clamp(26px,3vw,36px); margin-bottom:12px; line-height:1.08; }
+  .asset.feature p { font-size:15px; color:rgba(255,255,255,0.8); max-width:460px; }
+  .asset.feature .go { color:#fff; }
+  .feature-badge { justify-self:end; display:flex; flex-direction:column; align-items:center; gap:10px;
+    background:rgba(0,0,0,0.18); border:1px solid rgba(255,255,255,0.14); border-radius:16px; padding:26px 30px; }
+  .feature-badge .big { font-size:46px; font-weight:800; letter-spacing:-0.03em; color:#fff; line-height:1; }
+  .feature-badge .cap { font-size:11px; letter-spacing:0.1em; text-transform:uppercase; color:var(--accent); text-align:center; }
+
+  /* Medium assets */
+  .asset.med { background:var(--surface); padding:30px; display:flex; flex-direction:column; }
+  .asset.med .kicker { color:var(--accent); }
+  .asset.med h3 { font-size:22px; margin-bottom:10px; line-height:1.15; }
+  .asset.med p { font-size:14px; color:var(--text-soft); }
+  .asset.med .go { color:var(--accent); }
+
+  /* Accelerator assets */
+  .asset.acc { background:var(--bg-2); padding:26px 28px; display:flex; flex-direction:column; }
+  .asset.acc .kicker { color:var(--primary); }
+  .asset.acc h3 { font-size:19px; margin-bottom:8px; }
+  .asset.acc p { font-size:13.5px; color:var(--text-soft); }
+  .asset.acc .go { color:var(--accent); }
+  .res-sublabel { font-size:11px; letter-spacing:0.14em; text-transform:uppercase; color:var(--text-muted); margin:12px 0 2px; font-weight:600; }
+  .ungated { font-size:12px; color:var(--text-muted); margin-top:18px; display:inline-flex; align-items:center; gap:8px; }
+  .ungated::before { content:""; width:7px; height:7px; border-radius:50%; background:#5ad19a; }
 
   /* Final CTA */
-  .final { padding: 110px 0; text-align:center; background:var(--bg); }
+  .final { padding: 110px 0; text-align:center; background:radial-gradient(ellipse at 50% 0%, rgba(78,58,173,0.35), var(--bg) 60%); }
   .final .tag { font-size:12px; color:var(--primary); letter-spacing:0.14em; text-transform:uppercase; margin-bottom:18px; }
-  .final h2 { font-size:clamp(34px,4.2vw,54px); letter-spacing:-0.035em; line-height:1.06; font-weight:700; margin:0 auto 20px; max-width:780px; color:var(--text); }
-  .final p { font-size:17px; color:var(--text-muted); max-width:560px; margin:0 auto 32px; }
-  .final-cta { background: var(--primary); color:#fff; padding:16px 32px; border-radius:8px; text-decoration:none; font-weight:600; font-size:15px; display:inline-flex; align-items:center; gap:10px; transition:filter 0.2s, transform 0.15s; }
+  .final h2 { font-size:clamp(34px,4.4vw,56px); letter-spacing:-0.035em; line-height:1.04; font-weight:800; margin:0 auto 20px; max-width:820px; color:var(--text); }
+  .final h2 .accent { color: var(--primary); }
+  .final p { font-size:17px; color:var(--text-soft); max-width:600px; margin:0 auto 32px; line-height:1.55; }
+  .final-cta { background: var(--primary); color:#fff; padding:17px 34px; border-radius:8px; text-decoration:none; font-weight:600; font-size:15px; display:inline-flex; align-items:center; gap:10px; transition:filter 0.2s, transform 0.15s; border:none; cursor:pointer; font-family:inherit; }
   .final-cta:hover { filter:brightness(1.1); transform:translateY(-1px); }
   .final-cta .arrow { transition:transform 0.2s; }
   .final-cta:hover .arrow { transform:translateX(3px); }
+  .final-sub { margin-top:18px; font-size:13px; color:var(--text-muted); }
 
   footer { border-top:1px solid var(--border); padding:28px 0; font-size:13px; color:var(--text-muted); background:var(--bg); }
   .foot { display:flex; justify-content:space-between; align-items:center; gap:16px; flex-wrap:wrap; }
@@ -289,15 +360,97 @@
   .swap { transition: opacity 0.32s ease, transform 0.32s ease; }
   .swap.out { opacity:0; transform:translateY(6px); }
 
-  @media (prefers-reduced-motion: reduce) { * { transition:none !important; scroll-behavior:auto; } }
+  /* Modals */
+  .modal-overlay {
+    position:fixed; inset:0; z-index:100; background:rgba(8,8,12,0.72); backdrop-filter:blur(6px);
+    display:flex; align-items:center; justify-content:center; padding:24px;
+    opacity:0; pointer-events:none; transition:opacity 0.25s;
+  }
+  .modal-overlay.show { opacity:1; pointer-events:auto; }
+  .modal {
+    background:var(--bg-2); border:1px solid var(--border); border-radius:18px; width:100%; max-width:560px;
+    max-height:90vh; overflow:auto; position:relative; transform:translateY(14px) scale(0.98); transition:transform 0.28s;
+    box-shadow:0 40px 100px rgba(0,0,0,0.6);
+  }
+  .modal-overlay.show .modal { transform:translateY(0) scale(1); }
+  .modal-close { position:absolute; top:16px; right:16px; width:34px; height:34px; border-radius:50%; border:1px solid var(--border);
+    background:rgba(255,255,255,0.04); color:var(--text-soft); cursor:pointer; display:flex; align-items:center; justify-content:center; transition:all 0.2s; z-index:2; }
+  .modal-close:hover { background:rgba(255,255,255,0.1); color:#fff; }
+  .modal-pad { padding:34px; }
+  .modal .m-eyebrow { font-size:11px; letter-spacing:0.14em; text-transform:uppercase; color:var(--primary); margin-bottom:10px; }
+  .modal h3 { font-size:24px; font-weight:700; letter-spacing:-0.02em; margin-bottom:8px; color:#fff; }
+  .modal .m-sub { font-size:14px; color:var(--text-muted); line-height:1.5; margin-bottom:24px; }
+
+  /* Calendar */
+  .cal-top { display:flex; align-items:center; justify-content:space-between; margin-bottom:16px; }
+  .cal-month { font-size:15px; font-weight:600; color:#fff; }
+  .cal-nav { display:flex; gap:8px; }
+  .cal-nav button { width:32px; height:32px; border-radius:8px; border:1px solid var(--border); background:transparent; color:var(--text-soft); cursor:pointer; transition:all 0.2s; }
+  .cal-nav button:hover { background:rgba(255,255,255,0.06); color:#fff; }
+  .cal-grid { display:grid; grid-template-columns:repeat(7,1fr); gap:5px; }
+  .cal-dow { font-size:10px; text-transform:uppercase; letter-spacing:0.08em; color:var(--text-muted); text-align:center; padding-bottom:6px; }
+  .cal-day { aspect-ratio:1; border-radius:9px; border:1px solid transparent; background:var(--surface); color:var(--text-soft); font-size:13px; cursor:pointer; transition:all 0.18s; font-family:inherit; }
+  .cal-day:hover:not(:disabled) { border-color:var(--accent); color:#fff; }
+  .cal-day:disabled { opacity:0.22; cursor:default; background:transparent; }
+  .cal-day.sel { background:var(--primary); color:#fff; border-color:var(--primary); font-weight:600; }
+  .cal-day.empty { background:transparent; border:none; cursor:default; }
+  .slots { margin-top:22px; }
+  .slots-label { font-size:11px; letter-spacing:0.1em; text-transform:uppercase; color:var(--text-muted); margin-bottom:12px; }
+  .slot-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:8px; }
+  .slot { padding:11px 8px; border-radius:8px; border:1px solid var(--border); background:var(--surface); color:var(--text-soft); font-size:13px; cursor:pointer; transition:all 0.18s; font-family:inherit; text-align:center; }
+  .slot:hover { border-color:var(--accent); color:#fff; }
+  .slot.sel { background:var(--secondary); color:#fff; border-color:var(--secondary); }
+  .modal-foot { margin-top:24px; }
+  .btn-primary { width:100%; background:var(--primary); color:#fff; border:none; padding:15px; border-radius:9px; font-size:14px; font-weight:600; cursor:pointer; font-family:inherit; transition:filter 0.2s; }
+  .btn-primary:hover { filter:brightness(1.1); }
+  .btn-primary:disabled { opacity:0.4; cursor:default; }
+  .cal-tz { font-size:11px; color:var(--text-muted); margin-top:12px; text-align:center; }
+
+  /* Form */
+  .field { margin-bottom:16px; }
+  .field label { display:block; font-size:12px; color:var(--text-soft); margin-bottom:7px; font-weight:500; }
+  .field label .req { color:var(--primary); }
+  .field label .opt { color:var(--text-muted); font-weight:400; }
+  .field input, .field textarea {
+    width:100%; background:var(--surface); border:1px solid var(--border); border-radius:9px; padding:12px 14px;
+    color:#fff; font-family:inherit; font-size:14px; transition:border-color 0.2s;
+  }
+  .field input:focus, .field textarea:focus { outline:none; border-color:var(--accent); }
+  .field textarea { resize:vertical; min-height:74px; }
+  .field .err { color:var(--primary); font-size:11px; margin-top:5px; display:none; }
+  .field.invalid .err { display:block; }
+  .field.invalid input { border-color:var(--primary); }
+  .form-row { display:grid; grid-template-columns:1fr 1fr; gap:14px; }
+  .success-state { text-align:center; padding:20px 0; }
+  .success-state .check { width:58px; height:58px; border-radius:50%; background:rgba(90,209,154,0.15); color:#5ad19a; display:flex; align-items:center; justify-content:center; margin:0 auto 18px; }
+  .success-state h3 { margin-bottom:8px; }
+  .success-state p { font-size:14px; color:var(--text-muted); line-height:1.55; max-width:380px; margin:0 auto; }
+
+  @media (prefers-reduced-motion: reduce) { * { transition:none !important; animation:none !important; scroll-behavior:auto; } .unlock-line .w, .unlock-line .grad { opacity:1 !important; transform:none !important; } }
+  @media (max-width: 980px) {
+    .cap-head-grid { grid-template-columns:1fr; gap:24px; }
+    .asset.feature { grid-template-columns:1fr; }
+    .feature-badge { justify-self:start; }
+  }
   @media (max-width: 920px) {
-    .hero-grid,.stats,.proof-grid,.timeline-head,.who-grid,.ladder,.pos-points,.slow-grid,.who-stats,.cap-grid,.deliv-grid,.insight-grid { grid-template-columns:1fr; gap:24px; }
+    .hero-grid,.stats,.proof-grid,.timeline-head,.ladder,.slow-grid,.cap-grid,.deliv-grid,.res-row.two { grid-template-columns:1fr; gap:16px; }
     h1 { font-size:38px; }
-    .nav-meta { display:none; }
-    .timeline::before { left:56px; }
-    .day { grid-template-columns:52px 1fr; gap:22px; }
+    .side-switch { display:none; }
+    .pd-head { grid-template-columns:1fr auto; gap:12px; }
+    .pd-when { grid-column:1; }
+    .pd-body-inner { padding-left:4px; }
+    .form-row { grid-template-columns:1fr; }
     .ladder { gap:10px; }
   }
+  /* Mobile sticky switcher fallback: bottom bar */
+  .mobile-switch { display:none; }
+  @media (max-width: 920px) {
+    .mobile-switch.show { display:flex; position:fixed; bottom:16px; left:50%; transform:translateX(-50%); z-index:45;
+      gap:6px; background:rgba(20,20,28,0.92); backdrop-filter:blur(14px); border:1px solid var(--border); border-radius:999px; padding:7px; box-shadow:0 14px 40px rgba(0,0,0,0.5); }
+    .mobile-switch .ss-pill { font-size:11px; padding:8px 14px; }
+  }
+
+  .logo-img { height: 36px; width: auto; display: block; }
 </style>
 </head>
 <body>
@@ -305,10 +458,9 @@
 <header>
   <div class="container nav">
     <div class="logo">
-  <img src="logow.png" alt="Tezo" class="logo-img">
-</div>
-    <div class="nav-meta mono">A small Quality Engineering practice</div>
-    <a href="#book" class="nav-cta">Book a call</a>
+      <img src="logow.png" alt="Tezo" class="logo-img">
+    </div>
+    <button class="nav-cta" data-open="calendar">Book a call</button>
   </div>
 </header>
 
@@ -323,28 +475,43 @@
   </div>
 </section>
 
+<!-- Sticky side switcher -->
+<div class="side-switch" id="sideSwitch" aria-label="Switch perspective">
+  <span class="ss-label">Show me for</span>
+  <div class="ss-pills-wrap">
+    <button class="ss-pill active" data-role="eng">Engineering</button>
+    <button class="ss-pill" data-role="qa">Quality</button>
+    <button class="ss-pill" data-role="cio">Technology</button>
+  </div>
+</div>
+<div class="mobile-switch" id="mobileSwitch">
+  <button class="ss-pill active" data-role="eng">Eng</button>
+  <button class="ss-pill" data-role="qa">Quality</button>
+  <button class="ss-pill" data-role="cio">Tech</button>
+</div>
+
 <section class="hero">
   <div class="container hero-grid">
     <div>
       <div class="eyebrow swap" data-key="eyebrow">For VPs of Engineering / CTOs</div>
       <h1>Don't let quality <span class="accent">slow down</span> your business speed.</h1>
-      <p class="lede swap" data-key="lede">Your teams ship faster than they ever have. Quality is now the thing that decides whether that speed reaches customers or stalls right before it does. We run a two to three week assessment, then embed AI-augmented QE pods that <strong>turn quality from the bottleneck into the accelerator,</strong> without growing your headcount.</p>
+      <p class="lede swap" data-key="lede">Your teams ship faster than they ever have. Quality now decides whether that speed reaches customers or stalls right before it does. We run a two to four week assessment, then embed AI-augmented QE pods that <strong>turn quality from the bottleneck into the accelerator</strong> — without growing your headcount.</p>
       <a href="#solve" class="secondary-link">See how the assessment works &rarr;</a>
     </div>
     <aside class="offer-card">
       <div class="tag swap" data-key="card-tag">Start here</div>
       <div class="name swap" data-key="card-name">The Velocity Audit</div>
-      <div class="frame swap" data-key="card-frame">A two to three week QE assessment framed in DORA metrics. Same engagement, tuned to engineering leadership.</div>
+      <div class="frame swap" data-key="card-frame">A two to four week QE assessment framed in DORA metrics. Same engagement, tuned to engineering leadership.</div>
       <div class="specs">
-        <div class="row"><span class="k">Duration</span><span class="v">2 to 3 weeks</span></div>
+        <div class="row"><span class="k">Duration</span><span class="v">2 to 4 weeks</span></div>
         <div class="row"><span class="k">Team</span><span class="v">2 senior engineers</span></div>
         <div class="row"><span class="k">Output</span><span class="v">Audit + roadmap</span></div>
         <div class="row"><span class="k">Price</span><span class="v price">From $15,000</span></div>
       </div>
-      <a href="#book" class="card-cta">
+      <button class="card-cta" data-open="calendar">
         <span class="swap" data-key="card-cta">Book a scoping call</span>
         <span class="arrow">&rarr;</span>
-      </a>
+      </button>
     </aside>
   </div>
 </section>
@@ -352,8 +519,8 @@
 <section class="position" id="why">
   <div class="container">
     <div class="section-eyebrow">What we solve</div>
-    <p class="thesis">The problem is not that your people test too little. It is that in an AI-accelerated world, <em>quality has quietly become the new bottleneck.</em></p>
-    <p class="pos-close">We unlock quality speed.</p>
+    <p class="thesis">The problem isn't that your people test too little. In an AI-accelerated world, <em>quality has quietly become the new bottleneck.</em></p>
+    <p class="pos-close"><span class="unlock-line" id="unlockLine">We unlock <span class="grad">Quality speed.</span></span></p>
   </div>
 </section>
 
@@ -361,26 +528,30 @@
   <div class="container">
     <div class="slowdown-head">
       <div class="section-eyebrow">The real causes</div>
-      <h2 style="white-space:nowrap;">Your QE is actually slowing you down.</h2>      <p>Three patterns show up in almost every assessment we run. None of them are fixed by adding more testers.</p>
+      <h2>Where QE is actually slowing you down.</h2>
+      <p>Three patterns, in almost every assessment we run. Not one is solved by hiring more testers.</p>
     </div>
     <div class="slow-grid">
       <div class="slow-cell">
-        <div class="chip amber"><img src="icon1.png" style="width:22px;height:22px;object-fit:contain;"></div>        <div class="n mono">/ 01</div>
-        <h3>AI coding outpaced the safety net</h3>
-        <p>Developers now ship far more code with assistants, but QA capacity stayed flat. Review and regression became the line everything queues behind, so the speed you gained upstream is lost at the gate.</p>
-        <span class="stat mono">30 to 50% more code, same QA capacity</span>
+        <div class="chip amber"><svg viewBox="0 0 24 24" class="ic"><path d="m16 18 6-6-6-6"/><path d="m8 6-6 6 6 6"/></svg></div>
+        <div class="n mono">/ 01</div>
+        <h3>Code outran the safety net.</h3>
+        <p>Assistants ship 30–50% more code. QA capacity didn't move. The speed you gained upstream is lost at the gate.</p>
+        <span class="stat mono">More code. Same coverage.</span>
       </div>
       <div class="slow-cell">
-        <div class="chip amber"><img src="icon2.png" style="width:22px;height:22px;object-fit:contain;"></div>        <div class="n mono">/ 02</div>
-        <h3>Broken automation that still depends on too many people</h3>
-        <p>Brittle scripts break on every UI change. Teams burn most of their automation effort keeping the suite alive instead of growing coverage. It takes a crowd to run what should run itself.</p>
-        <span class="stat mono">35 to 45% of automation time on maintenance</span>
+        <div class="chip amber"><svg viewBox="0 0 24 24" class="ic"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></svg></div>
+        <div class="n mono">/ 02</div>
+        <h3>Automation that needs babysitting.</h3>
+        <p>Brittle suites break on every UI change. Most of the effort keeps tests alive instead of growing coverage.</p>
+        <span class="stat mono">~40% of effort lost to maintenance.</span>
       </div>
       <div class="slow-cell">
-        <div class="chip amber"><img src="icon3.png" style="width:22px;height:22px;object-fit:contain;"></div>        <div class="n mono">/ 03</div>
-        <h3>No CI/CD-native testing, no shift-left</h3>
-        <p>Quality sits at the end of the pipeline instead of inside it. Defects surface late, at the most expensive moment to fix, because testing was never wired into the build and the team never moved left.</p>
-        <span class="stat mono">Defects found late cost the most to fix</span>
+        <div class="chip amber"><svg viewBox="0 0 24 24" class="ic"><path d="M3 3v16a2 2 0 0 0 2 2h16"/><path d="m19 9-5 5-4-4-3 3"/></svg></div>
+        <div class="n mono">/ 03</div>
+        <h3>Testing bolted on at the end.</h3>
+        <p>Quality sits after the pipeline, not inside it. Defects surface late — exactly where they cost the most to fix.</p>
+        <span class="stat mono">Found late. Paid for twice.</span>
       </div>
     </div>
   </div>
@@ -388,35 +559,31 @@
 
 <section class="capability">
   <div class="container">
-    <div class="capability-head">
-      <div class="section-eyebrow">What "AI-augmented" actually means</div>
-      <h2>The augmentation is specific, not a slogan.</h2>
-      <p>We apply AI in the three places it measurably compresses QE work. Everywhere else, experienced engineers still make the call.</p>
+    <div class="cap-head-grid">
+      <h2>"AI-augmented" is a precise claim. <em>Three places. Measured.</em></h2>
+      <p class="cap-disclaimer">We apply AI in the three places it measurably compresses QE work. <strong>Everywhere else, experienced engineers still make the call.</strong></p>
     </div>
     <div class="cap-grid">
       <div class="cap-item">
-        <div class="chip persona"><svg viewBox="0 0 24 24" class="ic"><path d="M14 4.1 12 6"/><path d="m5.1 8-2.9-.8"/><path d="m6 12-1.9 2"/><path d="M7.2 2.2 8 5.1"/><path d="M9.037 9.69a.498.498 0 0 1 .653-.653l11 4.5a.5.5 0 0 1-.074.949l-4.349 1.041a1 1 0 0 0-.74.739l-1.04 4.35a.5.5 0 0 1-.95.074z"/></svg></div>
-        <h3>Tests generated from user stories</h3>
-        <p>Requirements and acceptance criteria become draft test cases automatically, so coverage tracks the backlog instead of lagging quarters behind it.</p>
-        <div class="where mono">Cuts authoring time, lifts coverage</div>
+        <div class="where mono">Authoring &darr; · Coverage &uarr;</div>
+        <h3>Tests written from your stories.</h3>
+        <p>Requirements become draft test cases automatically. Coverage tracks the backlog — not last quarter's.</p>
       </div>
       <div class="cap-item">
-        <div class="chip persona"><svg viewBox="0 0 24 24" class="ic"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="m9 12 2 2 4-4"/></svg></div>
-        <h3>Self-healing automation</h3>
-        <p>Locators that adapt when the UI shifts, so a renamed element does not break the suite. Maintenance stops eating the time meant for new coverage.</p>
-        <div class="where mono">Cuts the maintenance tax</div>
+        <div class="where mono">Maintenance tax &darr;</div>
+        <h3>Automation that heals itself.</h3>
+        <p>Locators adapt when the UI moves. A renamed element no longer breaks the suite, or your week.</p>
       </div>
       <div class="cap-item">
-        <div class="chip persona"><svg viewBox="0 0 24 24" class="ic"><path d="M3 3v16a2 2 0 0 0 2 2h16"/><path d="m19 9-5 5-4-4-3 3"/></svg></div>
-        <h3>Risk-based test selection</h3>
-        <p>Change analysis runs the tests most likely to catch a regression first, so a fraction of the suite protects the release without the full run.</p>
-        <div class="where mono">Shortens the path to a safe release</div>
+        <div class="where mono">Path to release &darr;</div>
+        <h3>Only the tests that matter run.</h3>
+        <p>Change analysis runs the highest-risk tests first. A fraction of the suite protects the whole release.</p>
       </div>
     </div>
   </div>
 </section>
 
-<section style="background:var(--bg);">
+<section class="stats-wrap">
   <div class="container">
     <div class="stats">
       <div class="swap" data-key="stat1">
@@ -463,61 +630,68 @@
     <div class="timeline-head">
       <div>
         <div class="section-eyebrow">How we solve it / the assessment</div>
-        <h2>A two to three week assessment. Same shape every time, tuned to the question that matters most for your role.</h2>
+        <h2>A two to four week assessment. To learn what's impacting your goals the most.</h2>
       </div>
       <div class="note swap" data-key="lens-note">
         <span class="lens">Your lens</span>
         We run the engagement against your DORA metrics and AI-coding adoption timeline. The synthesis ranks initiatives by their effect on change failure rate first.
       </div>
     </div>
-    <div class="timeline">
-      <div class="day">
-        <div class="day-marker mono">DAY 01</div>
-        <div class="day-content">
-          <h3>Kickoff and access</h3>
-          <p>A two-hour working session with your QA, engineering, and product leads. We name the three things this assessment has to answer.</p>
-          <span class="deliv mono">&rarr; Scope brief signed</span>
-        </div>
+    <div class="pd" id="timeline">
+      <div class="pd-item open">
+        <button class="pd-head">
+          <span class="pd-when mono">DAY 01</span>
+          <span class="pd-title">Kickoff &amp; access</span>
+          <span class="pd-toggle"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg></span>
+        </button>
+        <div class="pd-body"><div class="pd-body-inner">
+          <p>A two-hour working session with your QA, engineering, and product leads. We name the three questions this assessment has to answer.</p>
+          <span class="deliv mono">&rarr; Scope brief, signed</span>
+        </div></div>
       </div>
-      <div class="day">
-        <div class="day-marker mono">DAYS 02 TO 05</div>
-        <div class="day-content">
-          <h3>Coverage instrumentation</h3>
-          <p>We map your existing test estate against business-critical paths. Static analysis on the suite, plus conversations with the people who maintain it.</p>
+      <div class="pd-item">
+        <button class="pd-head">
+          <span class="pd-when mono">WEEK 1</span>
+          <span class="pd-title">Coverage mapping</span>
+          <span class="pd-toggle"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg></span>
+        </button>
+        <div class="pd-body"><div class="pd-body-inner">
+          <p>We map your test estate against business-critical paths — static analysis on the suite, plus the people who maintain it.</p>
           <span class="deliv mono">&rarr; Coverage heat-map</span>
-        </div>
+        </div></div>
       </div>
-      <div class="day">
-        <div class="day-marker mono">DAYS 06 TO 09</div>
-        <div class="day-content">
-          <h3 class="swap" data-key="day-mid-title">Defect leakage and DORA correlation</h3>
-          <p class="swap" data-key="day-mid-body">Six months of production defects pulled, classified, and traced. Then correlated to your AI-tooling adoption date so the cause and effect is visible, not assumed.</p>
+      <div class="pd-item">
+        <button class="pd-head">
+          <span class="pd-when mono">WEEK 2</span>
+          <span class="pd-title swap" data-key="day-mid-title">Defect leakage &amp; DORA correlation</span>
+          <span class="pd-toggle"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg></span>
+        </button>
+        <div class="pd-body"><div class="pd-body-inner">
+          <p class="swap" data-key="day-mid-body">Six months of production defects pulled, classified, and traced — then correlated to your AI-tooling adoption date, so cause and effect is visible, not assumed.</p>
           <span class="deliv mono">&rarr; Leakage report</span>
-        </div>
+        </div></div>
       </div>
-      <div class="day">
-        <div class="day-marker mono">DAYS 10 TO 12</div>
-        <div class="day-content">
-          <h3>Roadmap synthesis</h3>
-          <p>Twelve candidate initiatives, modeled for time, cost, and outcome. Ranked by ROI. The ones we would skip, called out by name.</p>
+      <div class="pd-item">
+        <button class="pd-head">
+          <span class="pd-when mono">WEEKS 2&ndash;3</span>
+          <span class="pd-title">Roadmap synthesis</span>
+          <span class="pd-toggle"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg></span>
+        </button>
+        <div class="pd-body"><div class="pd-body-inner">
+          <p>Candidate initiatives modeled for time, cost, and outcome — ranked by ROI. The ones we'd skip, named explicitly.</p>
           <span class="deliv mono">&rarr; Initiative ledger</span>
-        </div>
+        </div></div>
       </div>
-      <div class="day">
-        <div class="day-marker mono">DAYS 13 TO 14</div>
-        <div class="day-content">
-          <h3>Pressure test</h3>
-          <p>We walk the findings past your engineering leads. Anything that does not survive their pushback gets cut or rewritten before the readout.</p>
-          <span class="deliv mono">&rarr; Revised draft</span>
-        </div>
-      </div>
-      <div class="day">
-        <div class="day-marker mono">DAY 15</div>
-        <div class="day-content">
-          <h3>Readout and handoff</h3>
-          <p>A ninety-minute readout with the team you want in the room. Final deck, raw artifacts, recordings. Yours to execute with us or without.</p>
+      <div class="pd-item">
+        <button class="pd-head">
+          <span class="pd-when mono">WEEKS 3&ndash;4</span>
+          <span class="pd-title">Pressure test &amp; readout</span>
+          <span class="pd-toggle"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg></span>
+        </button>
+        <div class="pd-body"><div class="pd-body-inner">
+          <p>We walk the findings past your leads; anything that doesn't survive their pushback gets cut. Then a readout with the room you choose — deck, raw artifacts, recordings.</p>
           <span class="deliv mono">&rarr; Everything you paid for</span>
-        </div>
+        </div></div>
       </div>
     </div>
   </div>
@@ -526,24 +700,23 @@
 <section class="deliverables">
   <div class="container">
     <div class="deliverables-head">
-      <div class="section-eyebrow">What you walk away with</div>
-      <h2>Three artifacts, not a deck of motherhood statements.</h2>
+      <h2>What you walk away with.</h2>
     </div>
     <div class="deliv-grid">
       <div class="deliv-cell">
         <div class="num mono">/ 01</div>
         <h3>Coverage audit</h3>
-        <p>Where your testing actually sits against business-critical paths, heat-mapped, with the gaps named and prioritized rather than described in the abstract.</p>
+        <p>Where testing actually sits against business-critical paths — heat-mapped, gaps named and prioritized.</p>
       </div>
       <div class="deliv-cell">
         <div class="num mono">/ 02</div>
         <h3>Defect-leakage analysis</h3>
-        <p>The defects your customers find that your tests do not, classified by root cause, with the cost of prevention estimated for each pattern.</p>
+        <p>What your customers find that your tests don't — by root cause, with the cost of prevention for each.</p>
       </div>
       <div class="deliv-cell">
         <div class="num mono">/ 03</div>
         <h3>ROI-ranked roadmap</h3>
-        <p>A sequenced set of initiatives with investment, effort, and expected outcome for each. The ones we would skip are named explicitly.</p>
+        <p>Sequenced initiatives with investment, effort, and outcome. The ones to skip, named.</p>
       </div>
     </div>
   </div>
@@ -554,7 +727,7 @@
     <div class="ladder-head">
       <div class="section-eyebrow">The path, and where you choose to stop</div>
       <h2>Start with the assessment. Decide the rest once you have the findings.</h2>
-      <p>Each step is a decision point, not a commitment to the next. Many teams stop after the assessment and run the roadmap themselves. That is a good outcome too.</p>
+      <p>Each step is a decision point, not a commitment to the next. Many teams stop after the assessment and run the roadmap themselves. That's a good outcome too.</p>
     </div>
     <div class="ladder">
       <div class="step">
@@ -567,7 +740,7 @@
         <div class="step-num mono">/ 02</div>
         <div class="step-label">From $15K, fixed</div>
         <div class="step-title swap" data-key="ladder-step2-title">The Velocity Audit</div>
-        <div class="step-desc">The two to three week assessment. Coverage audit, defect-leakage analysis, ROI-ranked roadmap. Yours to keep.</div>
+        <div class="step-desc">The two to four week assessment. Coverage audit, defect-leakage analysis, ROI-ranked roadmap. Yours to keep.</div>
       </div>
       <div class="step">
         <div class="step-num mono">/ 03</div>
@@ -585,77 +758,77 @@
   </div>
 </section>
 
-<section class="who" id="who">
-  <div class="container">
-    <div class="section-eyebrow">Who we are</div>
-    <p class="who-lead">This is the Quality Engineering practice inside Tezo, an AI and digital transformation partner that helps enterprises modernize faster and scale smarter. Clients move off legacy vendors and onto Tezo for one reason. <em>We are here to deliver results, not decks.</em></p>
-    <div class="who-stats">
-      <div class="who-stat"><div class="v">250+</div><div class="l">specialists across AI, data, and digital</div></div>
-      <div class="who-stat"><div class="v">84+</div><div class="l">enterprise transformation programs delivered</div></div>
-      <div class="who-stat"><div class="v">3+</div><div class="l">product IPs built and shipped in-house</div></div>
-    </div>
-    <div class="who-grid">
-      <div class="who-item">
-        <div class="chip persona"><svg viewBox="0 0 24 24" class="ic"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg></div>
-        <div class="n mono">/ 01</div>
-        <h3>A small, senior pod with an enterprise bench</h3>
-        <p>The QE practice stays deliberately small and senior. Behind it sits Tezo's full AI, data, and digital capability, so a focused team is never a thin one. The engineers on the call are the engineers on the build.</p>
-      </div>
-      <div class="who-item">
-        <div class="chip persona"><svg viewBox="0 0 24 24" class="ic"><polygon points="12 2 2 7 12 12 22 7 12 2"/><polyline points="2 17 12 22 22 17"/><polyline points="2 12 12 17 22 12"/></svg></div>
-        <div class="n mono">/ 02</div>
-        <h3>We work like a product company, even when we consult</h3>
-        <p>Tezo brings product-grade craft to services work at consulting speed. Every engagement starts with a shared definition of success and is shaped by feedback, not tickets. Outcomes are priced, not hours.</p>
-      </div>
-      <div class="who-item">
-        <div class="chip persona"><svg viewBox="0 0 24 24" class="ic"><path d="M4.5 16.5c-1.5 1.26-2 5-2 5s3.74-.5 5-2c.71-.84.7-2.13-.09-2.91a2.18 2.18 0 0 0-2.91-.09z"/><path d="m12 15-3-3a22 22 0 0 1 2-3.95A12.88 12.88 0 0 1 22 2c0 2.72-.78 7.5-6 11a22.35 22.35 0 0 1-4 2z"/><path d="M9 12H4s.55-3.03 2-4c1.62-1.08 5 0 5 0"/><path d="M12 15v5s3.03-.55 4-2c1.08-1.62 0-5 0-5"/></svg></div>
-        <div class="n mono">/ 03</div>
-        <h3>From PoCs to pipelines</h3>
-        <p>Tezo takes AI and quality work past the prototype and into production. The frameworks, runbooks, and artifacts we build are yours from day one. If your team can run it without us, we say so.</p>
-      </div>
-    </div>
-  </div>
-</section>
-
 <section class="insights" id="insights">
   <div class="container">
     <div class="insights-head">
-      <div class="section-eyebrow">Insights and tools</div>
-      <h2>Three ways to engage before you ever book a call.</h2>
-      <p>Use them in any order. Each one is built to be useful on its own, whether or not we ever speak.</p>
+      <div class="section-eyebrow">Insights &amp; tools</div>
+      <h2>Engage before you ever book a call.</h2>
+      <p>Every asset is built to be useful on its own — whether or not we ever speak. <span style="color:var(--text-soft)">All open. None gated.</span></p>
     </div>
-    <div class="insight-grid">
-      <div class="insight-card">
-        <div class="insight-tag">Interactive &middot; Assessment</div>
-        <h3>QE Maturity Assessment</h3>
-        <p>A short, scored questionnaire that places your quality function on a five-level maturity curve across the pillars that matter, then returns a benchmark and a PDF you keep. Ten minutes, no sales call attached.</p>
-        <div class="insight-foot"><span class="insight-soon">Launching soon</span></div>
+
+    <div class="res-stack">
+      <!-- Featured: interactive assessment -->
+      <a href="https://tezos-dynamite-site.webflow.io/draft-version/maketing-site-temp" target="_blank" rel="noopener" class="asset feature">
+        <div style="display:flex;flex-direction:column;">
+          <span class="kicker mono">Interactive tool · 10 minutes</span>
+          <h3>QE Maturity Assessment</h3>
+          <p>A scored questionnaire that places your quality function on a five-level maturity curve, then returns a benchmark you keep. No sales call attached.</p>
+          <span class="go">Open the assessment <span class="arrow">&rarr;</span></span>
+        </div>
+        <div class="feature-badge">
+          <span class="big">5</span>
+          <span class="cap">maturity levels<br>scored instantly</span>
+        </div>
+      </a>
+
+      <!-- Medium: report + POV -->
+      <div class="res-sublabel">Read</div>
+      <div class="res-row two">
+        <a href="State-of-AI-in-QE-2026.pdf" target="_blank" rel="noopener" class="asset med">
+          <span class="kicker mono">Report · 2026</span>
+          <h3>The State of AI in QE, 2026</h3>
+          <p>Our field report on what AI actually did to software quality — built on the World Quality Report, Google DORA, and GitClear. Speed went up. Stability went down.</p>
+          <span class="go">Read the report <span class="arrow">&rarr;</span></span>
+        </a>
+        <a href="QE-POV-Who-Tests-the-AI.pdf" target="_blank" rel="noopener" class="asset med">
+          <span class="kicker mono">eBook · Point of view</span>
+          <h3>Who tests the AI?</h3>
+          <p>When software stops behaving predictably, traditional QA quietly stops working. Why evals, guardrails, and continuous evaluation become the new safety net.</p>
+          <span class="go">Read the POV <span class="arrow">&rarr;</span></span>
+        </a>
       </div>
-      <div class="insight-card">
-        <div class="insight-tag">Report &middot; Gated</div>
-        <h3>State of AI in QE, 2026</h3>
-        <p>Our field report on what AI has actually done to software quality, built on the World Quality Report, Google DORA, and GitClear. AI now touches most code, yet delivery stability has slipped and duplicated code has multiplied.</p>
-        <div class="insight-foot"><a href="#" class="insight-link"><span>Read the report</span><span class="arrow">&rarr;</span></a></div>
+
+      <!-- Accelerators -->
+      <div class="res-sublabel">Solution accelerators</div>
+      <div class="res-row two">
+        <a href="Tezo_AI_for_QE_Solution_Accelerator.pdf" target="_blank" rel="noopener" class="asset acc">
+          <span class="kicker mono">Accelerator</span>
+          <h3>AI for QE</h3>
+          <p>Test generation, self-healing automation, and risk-based selection — the reusable components behind faster QE delivery.</p>
+          <span class="go">View the accelerator <span class="arrow">&rarr;</span></span>
+        </a>
+        <a href="Tezo_QE_for_AI_Solution_Accelerator.pdf" target="_blank" rel="noopener" class="asset acc">
+          <span class="kicker mono">Accelerator</span>
+          <h3>QE for AI</h3>
+          <p>An evaluation-first approach for testing LLM systems: prompt evals, scoring, guardrails, and drift monitoring.</p>
+          <span class="go">View the accelerator <span class="arrow">&rarr;</span></span>
+        </a>
       </div>
-      <div class="insight-card">
-        <div class="insight-tag">Point of view</div>
-        <h3>Who tests the AI?</h3>
-        <p>Our position on testing software that no longer behaves predictably. As generative AI features reach production, exact-match testing quietly breaks, and evals, guardrails, and continuous evaluation become the new safety net.</p>
-        <div class="insight-foot"><a href="QE-POV-Who-Tests-the-AI.pdf" class="insight-link"><span>Read the POV</span><span class="arrow">&rarr;</span></a></div>
-      </div>
+      <span class="ungated">Everything above is free and ungated.</span>
     </div>
   </div>
 </section>
 
 <section class="final" id="book">
   <div class="container">
-    <div class="tag swap" data-key="final-tag">Book a 30-minute scoping call</div>
-    <h2>Thirty minutes to scope it. Two to three weeks to answer it.</h2>
-    <p>If release quality is a board-level conversation for you in 2026, this is the lowest-risk way to know exactly where you stand.</p>
-    <a href="#" class="final-cta">
+    <div class="tag swap" data-key="final-tag">Start the assessment</div>
+    <h2>Find out exactly what quality is costing you. <span class="accent">In four weeks, not four quarters.</span></h2>
+    <p>If release quality is a board-level question for you in 2026, this is the lowest-risk way to get a straight answer — and the roadmap to fix it. You keep everything, whether you continue with us or not.</p>
+    <button class="final-cta" data-open="form">
       <span class="swap" data-key="final-cta">Book the Velocity Audit</span>
       <span class="arrow">&rarr;</span>
-    </a>
+    </button>
+    <div class="final-sub">A 30-minute scoping call. No prep required.</div>
   </div>
 </section>
 
@@ -670,13 +843,100 @@
   </div>
 </footer>
 
+<!-- Calendar modal -->
+<div class="modal-overlay" id="calModal" role="dialog" aria-modal="true" aria-label="Book a call">
+  <div class="modal" style="max-width:520px;">
+    <button class="modal-close" data-close aria-label="Close">&times;</button>
+    <div class="modal-pad">
+      <div class="m-eyebrow">Book a 30-minute scoping call</div>
+      <h3>Pick a time that works.</h3>
+      <p class="m-sub">A focused 30 minutes to scope your assessment. No prep, no slide deck required.</p>
+      <div class="cal-top">
+        <div class="cal-month" id="calMonth">Month</div>
+        <div class="cal-nav">
+          <button id="calPrev" aria-label="Previous month">&lsaquo;</button>
+          <button id="calNext" aria-label="Next month">&rsaquo;</button>
+        </div>
+      </div>
+      <div class="cal-grid" id="calDow"></div>
+      <div class="cal-grid" id="calDays" style="margin-top:5px;"></div>
+      <div class="slots" id="calSlots" style="display:none;">
+        <div class="slots-label" id="slotsLabel">Available times</div>
+        <div class="slot-grid" id="slotGrid"></div>
+      </div>
+      <div class="modal-foot">
+        <button class="btn-primary" id="calConfirm" disabled>Select a date and time</button>
+        <div class="cal-tz">Times shown in your local timezone</div>
+      </div>
+      <div class="success-state" id="calSuccess" style="display:none;">
+        <div class="check"><svg viewBox="0 0 24 24" class="ic" style="width:28px;height:28px;stroke-width:2.5;"><path d="M20 6 9 17l-5-5"/></svg></div>
+        <h3>You're booked.</h3>
+        <p id="calSuccessMsg">We'll send a calendar invite and a short scope primer to your inbox.</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Lead form modal -->
+<div class="modal-overlay" id="formModal" role="dialog" aria-modal="true" aria-label="Book the assessment">
+  <div class="modal">
+    <button class="modal-close" data-close aria-label="Close">&times;</button>
+    <div class="modal-pad">
+      <div id="formContent">
+        <div class="m-eyebrow">Book the Velocity Audit</div>
+        <h3>Tell us where to start.</h3>
+        <p class="m-sub">A few details and we'll reach out within one business day to scope your two to four week assessment.</p>
+        <form id="leadForm" novalidate>
+          <div class="field" data-field>
+            <label>Full name <span class="req">*</span></label>
+            <input type="text" name="name" autocomplete="name" required>
+            <div class="err">Please enter your name.</div>
+          </div>
+          <div class="field" data-field>
+            <label>Work email <span class="req">*</span></label>
+            <input type="email" name="email" autocomplete="email" required>
+            <div class="err">Please enter a valid work email.</div>
+          </div>
+          <div class="field" data-field>
+            <label>Company <span class="req">*</span></label>
+            <input type="text" name="company" autocomplete="organization" required>
+            <div class="err">Please enter your company.</div>
+          </div>
+          <div class="form-row">
+            <div class="field">
+              <label>Phone <span class="opt">(optional)</span></label>
+              <input type="tel" name="phone" autocomplete="tel">
+            </div>
+            <div class="field">
+              <label>Notes <span class="opt">(optional)</span></label>
+              <input type="text" name="notes_short" placeholder="e.g. ERP go-live in Q3">
+            </div>
+          </div>
+          <div class="field">
+            <label>Anything we should know? <span class="opt">(optional)</span></label>
+            <textarea name="notes" placeholder="Your stack, timeline, or the question keeping you up at night."></textarea>
+          </div>
+          <div class="modal-foot">
+            <button type="submit" class="btn-primary">Request my assessment &rarr;</button>
+          </div>
+        </form>
+      </div>
+      <div class="success-state" id="formSuccess" style="display:none;">
+        <div class="check"><svg viewBox="0 0 24 24" class="ic" style="width:28px;height:28px;stroke-width:2.5;"><path d="M20 6 9 17l-5-5"/></svg></div>
+        <h3>Got it. Talk soon.</h3>
+        <p>We'll be in touch within one business day to scope your assessment. Keep an eye on your inbox.</p>
+      </div>
+    </div>
+  </div>
+</div>
+
 <script>
   const content = {
     eng: {
       eyebrow: "For VPs of Engineering / CTOs",
-      lede: "Your teams ship faster than they ever have. Quality is now the thing that decides whether that speed reaches customers or stalls right before it does. We run a two to three week assessment, then embed AI-augmented QE pods that <strong>turn quality from the bottleneck into the accelerator,</strong> without growing your headcount.",
+      lede: "Your teams ship faster than they ever have. Quality now decides whether that speed reaches customers or stalls right before it does. We run a two to four week assessment, then embed AI-augmented QE pods that <strong>turn quality from the bottleneck into the accelerator</strong> — without growing your headcount.",
       "card-tag": "Start here", "card-name": "The Velocity Audit",
-      "card-frame": "A two to three week QE assessment framed in DORA metrics. Same engagement, tuned to engineering leadership.",
+      "card-frame": "A two to four week QE assessment framed in DORA metrics. Same engagement, tuned to engineering leadership.",
       "card-cta": "Book a scoping call",
       stat1: '<div class="stat-num"><span class="accent">30 to 50%</span></div><div class="stat-label">more code volume on teams that adopted AI coding tools</div>',
       stat2: '<div class="stat-num"><span class="accent">20 to 30%</span></div><div class="stat-label">typical rise in escaped defects when QE does not scale with code volume</div>',
@@ -688,15 +948,16 @@
       "quote-text": "We were shipping weekly, but our change failure rate kept climbing. Adding testers was never going to fix what was really a judgment problem.",
       "quote-attr": "VP Engineering, B2B SaaS platform",
       "lens-note": '<span class="lens">Your lens</span>We run the engagement against your DORA metrics and AI-coding adoption timeline. The synthesis ranks initiatives by their effect on change failure rate first.',
-      "day-mid-title": "Defect leakage and DORA correlation",
-      "day-mid-body": "Six months of production defects pulled, classified, and traced. Then correlated to your AI-tooling adoption date so the cause and effect is visible, not assumed.",
-      "ladder-step2-title": "The Velocity Audit", "final-tag": "Book a 30-minute scoping call", "final-cta": "Book the Velocity Audit"
+      "day-mid-title": "Defect leakage &amp; DORA correlation",
+      "day-mid-body": "Six months of production defects pulled, classified, and traced — then correlated to your AI-tooling adoption date, so cause and effect is visible, not assumed.",
+      "ladder-step2-title": "The Velocity Audit", "final-tag": "Start the assessment", "final-cta": "Book the Velocity Audit",
+      calLabel: "The Velocity Audit"
     },
     qa: {
       eyebrow: "For VPs / Directors of Quality",
-      lede: "Your automation suite has quietly become more maintenance than testing, and coverage has not moved in quarters. We run a two to three week assessment, then rebuild on self-healing automation and AI-generated tests so <strong>coverage grows without growing the team.</strong>",
+      lede: "Your automation suite has quietly become more maintenance than testing, and coverage hasn't moved in quarters. We run a two to four week assessment, then rebuild on self-healing automation and AI-generated tests so <strong>coverage grows without growing the team.</strong>",
       "card-tag": "Start here", "card-name": "The Automation Audit",
-      "card-frame": "A two to three week QE assessment of your test estate. Same engagement, tuned to quality leadership.",
+      "card-frame": "A two to four week QE assessment of your test estate. Same engagement, tuned to quality leadership.",
       "card-cta": "Audit our automation",
       stat1: '<div class="stat-num"><span class="accent">35 to 45%</span></div><div class="stat-label">of automation time spent fixing flaky tests, not adding coverage</div>',
       stat2: '<div class="stat-num"><span class="accent">18% &rarr; 60%</span></div><div class="stat-label">coverage uplift in ten weeks on a recent engagement</div>',
@@ -708,15 +969,16 @@
       "quote-text": "We were struggling with a legacy architecture where automation was not really possible, and a fifty-person manual QA vendor that had become slower, not safer.",
       "quote-attr": "Director of Quality, insurance carrier",
       "lens-note": '<span class="lens">Your lens</span>We profile your current automation in numbers: flaky-test rate, locator instability, maintenance hours. The synthesis costs out self-healing automation against your suite.',
-      "day-mid-title": "Defect leakage and flakiness analysis",
+      "day-mid-title": "Defect leakage &amp; flakiness analysis",
       "day-mid-body": "Six months of production defects pulled, classified, and traced back to where they should have been caught. We also measure flaky-test burden and locator instability in numbers, not anecdotes.",
-      "ladder-step2-title": "The Automation Audit", "final-tag": "Book a 30-minute scoping call", "final-cta": "Book the Automation Audit"
+      "ladder-step2-title": "The Automation Audit", "final-tag": "Start the assessment", "final-cta": "Book the Automation Audit",
+      calLabel: "The Automation Audit"
     },
     cio: {
       eyebrow: "For CIOs / IT Directors",
-      lede: "Late UAT discovery. Business users buried in spreadsheets. Regression managed by tribal knowledge. We run a two to three week assessment, then stand up <strong>migration test factories</strong> that take the UAT burden off your team and <strong>protect your go-live date.</strong>",
+      lede: "Late UAT discovery. Business users buried in spreadsheets. Regression managed by tribal knowledge. We run a two to four week assessment, then stand up <strong>migration test factories</strong> that take the UAT burden off your team and <strong>protect your go-live date.</strong>",
       "card-tag": "Start here", "card-name": "Migration Readiness Review",
-      "card-frame": "A two to three week QE assessment of your migration test plan. Same engagement, tuned to platform transitions.",
+      "card-frame": "A two to four week QE assessment of your migration test plan. Same engagement, tuned to platform transitions.",
       "card-cta": "Run a readiness review",
       stat1: '<div class="stat-num"><span class="accent">70%</span></div><div class="stat-label">reduction in business-user UAT time on a typical migration</div>',
       stat2: '<div class="stat-num"><span class="accent">4 to 6 weeks</span></div><div class="stat-label">from contract to a working test factory parallel to your build</div>',
@@ -728,16 +990,22 @@
       "quote-text": "Every migration we had run slipped on testing, never on development. We needed the date protected, not another status deck.",
       "quote-attr": "CIO, manufacturing group",
       "lens-note": '<span class="lens">Your lens</span>We assess your migration against go-live risk, not feature parity. The synthesis names the slip-risks by date and the moves that take them off the critical path.',
-      "day-mid-title": "UAT readiness and slip-risk mapping",
+      "day-mid-title": "UAT readiness &amp; slip-risk mapping",
       "day-mid-body": "Six months of program risks pulled and classified. We then map UAT readiness against the migration timeline, calling out where late discovery is most likely to slip the date.",
-      "ladder-step2-title": "Migration Readiness Review", "final-tag": "Book a 30-minute scoping call", "final-cta": "Book the Migration Readiness Review"
+      "ladder-step2-title": "Migration Readiness Review", "final-tag": "Start the assessment", "final-cta": "Book the Migration Readiness Review",
+      calLabel: "Migration Readiness Review"
     }
   };
 
-  const pills = document.querySelectorAll('.role-pill');
+  let currentRole = 'eng';
 
   function setRole(role) {
+    currentRole = role;
     const data = content[role];
+    // sync all pill groups
+    document.querySelectorAll('.role-pill, .ss-pill').forEach(p => {
+      p.classList.toggle('active', p.dataset.role === role);
+    });
     document.querySelectorAll('.swap').forEach(el => el.classList.add('out'));
     setTimeout(() => {
       document.querySelectorAll('.swap').forEach(el => {
@@ -748,11 +1016,176 @@
     }, 280);
   }
 
-  pills.forEach(p => p.addEventListener('click', () => {
-    pills.forEach(x => x.classList.remove('active'));
-    p.classList.add('active');
-    setRole(p.dataset.role);
-  }));
+  document.querySelectorAll('.role-pill, .ss-pill').forEach(p => {
+    p.addEventListener('click', () => setRole(p.dataset.role));
+  });
+
+  // Sticky side switcher visibility — show after scrolling past the role bar
+  const sideSwitch = document.getElementById('sideSwitch');
+  const mobileSwitch = document.getElementById('mobileSwitch');
+  const roleBar = document.querySelector('.role-bar');
+  const finalSection = document.getElementById('book');
+  function onScroll() {
+    const past = window.scrollY > (roleBar.offsetTop + roleBar.offsetHeight);
+    const beforeFinal = (finalSection.getBoundingClientRect().top) > window.innerHeight * 0.6;
+    const show = past && beforeFinal;
+    sideSwitch.classList.toggle('show', show);
+    mobileSwitch.classList.toggle('show', show);
+  }
+  window.addEventListener('scroll', onScroll, { passive:true });
+  onScroll();
+
+  // Progressive disclosure timeline
+  document.querySelectorAll('#timeline .pd-item').forEach(item => {
+    const head = item.querySelector('.pd-head');
+    const body = item.querySelector('.pd-body');
+    function refresh() {
+      body.style.maxHeight = item.classList.contains('open') ? body.scrollHeight + 'px' : '0px';
+    }
+    if (item.classList.contains('open')) requestAnimationFrame(refresh);
+    head.addEventListener('click', () => {
+      const isOpen = item.classList.contains('open');
+      document.querySelectorAll('#timeline .pd-item').forEach(o => {
+        o.classList.remove('open');
+        o.querySelector('.pd-body').style.maxHeight = '0px';
+      });
+      if (!isOpen) { item.classList.add('open'); refresh(); }
+    });
+  });
+
+  // Replay the unlock-line animation when scrolled into view
+  const unlock = document.getElementById('unlockLine');
+  if (unlock && 'IntersectionObserver' in window) {
+    const io = new IntersectionObserver((entries) => {
+      entries.forEach(e => {
+        if (e.isIntersecting) {
+          unlock.querySelectorAll('.w, .grad').forEach((el, i) => {
+            el.style.animation = 'none'; void el.offsetWidth;
+            el.style.animation = '';
+            el.style.animationDelay = (i * 0.12) + 's';
+          });
+        }
+      });
+    }, { threshold: 0.6 });
+    io.observe(unlock);
+  }
+
+  /* ---------- Modals ---------- */
+  function openModal(id) { document.getElementById(id).classList.add('show'); document.body.style.overflow='hidden'; }
+  function closeModal(el) { el.classList.remove('show'); document.body.style.overflow=''; }
+  document.querySelectorAll('[data-open]').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const which = btn.dataset.open;
+      if (which === 'calendar') { resetCalendar(); openModal('calModal'); }
+      else if (which === 'form') { resetForm(); openModal('formModal'); }
+    });
+  });
+  document.querySelectorAll('.modal-overlay').forEach(ov => {
+    ov.addEventListener('click', e => { if (e.target === ov) closeModal(ov); });
+    ov.querySelectorAll('[data-close]').forEach(b => b.addEventListener('click', () => closeModal(ov)));
+  });
+  document.addEventListener('keydown', e => {
+    if (e.key === 'Escape') document.querySelectorAll('.modal-overlay.show').forEach(closeModal);
+  });
+
+  /* ---------- Calendar ---------- */
+  const calMonthEl = document.getElementById('calMonth');
+  const calDaysEl = document.getElementById('calDays');
+  const calDowEl = document.getElementById('calDow');
+  const calSlots = document.getElementById('calSlots');
+  const slotGrid = document.getElementById('slotGrid');
+  const slotsLabel = document.getElementById('slotsLabel');
+  const calConfirm = document.getElementById('calConfirm');
+  const calSuccess = document.getElementById('calSuccess');
+  const SLOTS = ['9:00 AM','10:00 AM','11:00 AM','1:00 PM','2:00 PM','3:00 PM','4:00 PM','4:30 PM'];
+  let viewDate = new Date(); let selDate = null; let selSlot = null;
+  ['S','M','T','W','T','F','S'].forEach(d => { const e=document.createElement('div'); e.className='cal-dow'; e.textContent=d; calDowEl.appendChild(e); });
+
+  function renderCal() {
+    const y = viewDate.getFullYear(), m = viewDate.getMonth();
+    calMonthEl.textContent = viewDate.toLocaleString('en-US',{month:'long',year:'numeric'});
+    calDaysEl.innerHTML = '';
+    const first = new Date(y,m,1).getDay();
+    const days = new Date(y,m+1,0).getDate();
+    const today = new Date(); today.setHours(0,0,0,0);
+    for (let i=0;i<first;i++){ const e=document.createElement('div'); e.className='cal-day empty'; calDaysEl.appendChild(e); }
+    for (let d=1; d<=days; d++){
+      const btn=document.createElement('button'); btn.className='cal-day'; btn.textContent=d;
+      const date=new Date(y,m,d); const dow=date.getDay();
+      const isPast = date < today; const isWeekend = dow===0||dow===6;
+      if (isPast || isWeekend) btn.disabled=true;
+      if (selDate && selDate.getTime()===date.getTime()) btn.classList.add('sel');
+      btn.addEventListener('click', () => {
+        selDate=date; selSlot=null;
+        renderCal(); showSlots(date);
+      });
+      calDaysEl.appendChild(btn);
+    }
+  }
+  function showSlots(date){
+    slotsLabel.textContent = 'Available · ' + date.toLocaleDateString('en-US',{weekday:'long', month:'long', day:'numeric'});
+    slotGrid.innerHTML='';
+    SLOTS.forEach(s => {
+      const b=document.createElement('button'); b.className='slot'; b.textContent=s;
+      b.addEventListener('click', () => {
+        selSlot=s; slotGrid.querySelectorAll('.slot').forEach(x=>x.classList.remove('sel')); b.classList.add('sel');
+        calConfirm.disabled=false; calConfirm.textContent='Confirm ' + date.toLocaleDateString('en-US',{month:'short',day:'numeric'}) + ' at ' + s;
+      });
+      slotGrid.appendChild(b);
+    });
+    calSlots.style.display='block';
+    calConfirm.disabled=true; calConfirm.textContent='Select a time';
+  }
+  document.getElementById('calPrev').addEventListener('click', () => { viewDate=new Date(viewDate.getFullYear(),viewDate.getMonth()-1,1); renderCal(); });
+  document.getElementById('calNext').addEventListener('click', () => { viewDate=new Date(viewDate.getFullYear(),viewDate.getMonth()+1,1); renderCal(); });
+  calConfirm.addEventListener('click', () => {
+    if (!selDate || !selSlot) return;
+    document.querySelector('#calModal .cal-top').style.display='none';
+    calDaysEl.style.display='none'; calDowEl.style.display='none'; calSlots.style.display='none';
+    document.querySelector('#calModal .modal-foot').style.display='none';
+    document.querySelector('#calModal h3').style.display='none';
+    document.querySelector('#calModal .m-sub').style.display='none';
+    document.querySelector('#calModal .m-eyebrow').style.display='none';
+    document.getElementById('calSuccessMsg').textContent = 'Confirmed for ' + selDate.toLocaleDateString('en-US',{weekday:'long', month:'long', day:'numeric'}) + ' at ' + selSlot + '. A calendar invite and short scope primer are on the way to your inbox.';
+    calSuccess.style.display='block';
+  });
+  function resetCalendar(){
+    viewDate=new Date(); selDate=null; selSlot=null;
+    document.querySelector('#calModal .cal-top').style.display='';
+    calDaysEl.style.display=''; calDowEl.style.display='';
+    document.querySelector('#calModal .modal-foot').style.display='';
+    document.querySelector('#calModal h3').style.display='';
+    document.querySelector('#calModal h3').textContent='Pick a time that works.';
+    const sub = document.querySelector('#calModal .m-sub'); sub.style.display='';
+    document.querySelector('#calModal .m-eyebrow').style.display='';
+    calSuccess.style.display='none'; calSlots.style.display='none';
+    calConfirm.disabled=true; calConfirm.textContent='Select a date and time';
+    renderCal();
+  }
+  renderCal();
+
+  /* ---------- Lead form ---------- */
+  const leadForm = document.getElementById('leadForm');
+  function resetForm(){
+    leadForm.reset();
+    leadForm.querySelectorAll('.field').forEach(f=>f.classList.remove('invalid'));
+    document.getElementById('formContent').style.display='';
+    document.getElementById('formSuccess').style.display='none';
+  }
+  leadForm.addEventListener('submit', e => {
+    e.preventDefault();
+    let ok=true;
+    leadForm.querySelectorAll('[data-field]').forEach(f=>{
+      const input=f.querySelector('input');
+      let valid = input.value.trim() !== '';
+      if (input.type==='email') valid = /^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(input.value.trim());
+      f.classList.toggle('invalid', !valid);
+      if(!valid) ok=false;
+    });
+    if(!ok) return;
+    document.getElementById('formContent').style.display='none';
+    document.getElementById('formSuccess').style.display='block';
+  });
 </script>
 </body>
 </html>
