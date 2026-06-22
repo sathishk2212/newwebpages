@@ -1,0 +1,620 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Tezo — RFQ &amp; Order Automation: Self-Discovery</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,400&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --ink:#1B1340; --graphite:#0d0d12; --canvas:#F5F3EF; --paper:#FFFFFF;
+    --red:#e54a59; --red-bright:#ef6470; --blue:#4e3aad; --blue-bright:#6e57d9;
+    --lilac:#b0a8fe; --beige:#E8DCCC; --line:#E3DED5; --line-dark:rgba(176,168,254,0.14);
+    --muted:#6A6478; --muted-dark:rgba(255,255,255,0.55); --positive:#1F9D6E;
+    --radius:14px; --maxw:780px;
+    --display:'Inter',-apple-system,sans-serif;
+    --body:'Inter',-apple-system,sans-serif;
+    --mono:'Inter',-apple-system,sans-serif;
+  }
+  *{box-sizing:border-box;}
+  html{scroll-behavior:smooth;}
+  body{margin:0;min-height:100vh;font-family:var(--body);color:#fff;
+    background:
+      radial-gradient(120% 90% at 85% -10%,rgba(78,58,173,0.4) 0%,transparent 55%),
+      radial-gradient(90% 80% at 0% 110%,rgba(176,168,254,0.10) 0%,transparent 50%),
+      var(--graphite);
+    background-attachment:fixed;line-height:1.55;-webkit-font-smoothing:antialiased;display:flex;flex-direction:column;}
+  h1,h2,h3,h4{font-family:var(--display);font-weight:700;line-height:1.05;letter-spacing:-0.03em;margin:0;}
+  p{margin:0;} button{font-family:inherit;}
+  ::selection{background:var(--red);color:#fff;}
+  .bgrid{position:fixed;inset:0;z-index:0;pointer-events:none;opacity:.5;
+    background-image:linear-gradient(transparent 47px,rgba(255,255,255,.035) 48px),linear-gradient(90deg,transparent 47px,rgba(255,255,255,.035) 48px);
+    background-size:48px 48px;mask-image:radial-gradient(120% 80% at 60% 0%,#000 30%,transparent 78%);}
+
+  .top{position:relative;z-index:3;display:flex;align-items:center;justify-content:space-between;max-width:1100px;margin:0 auto;width:100%;padding:20px 28px;}
+  .logo{font-family:var(--display);font-weight:700;letter-spacing:-0.03em;color:#fff;font-size:21px;display:flex;align-items:center;gap:10px;}
+  .logo .dot{width:9px;height:9px;background:var(--red);border-radius:2px;transform:rotate(45deg);}
+  .top .tag{font-family:var(--mono);text-transform:uppercase;letter-spacing:.14em;font-size:10.5px;color:var(--muted-dark);}
+
+  .stage{position:relative;z-index:2;flex:1;display:flex;align-items:center;justify-content:center;width:100%;padding:24px 24px 60px;}
+  .card{width:100%;max-width:var(--maxw);}
+  .view{display:none;animation:fade .4s ease;}
+  .view.active{display:block;}
+  @keyframes fade{from{opacity:0;transform:translateY(14px);}to{opacity:1;transform:none;}}
+
+  .mono{font-family:var(--mono);text-transform:uppercase;letter-spacing:.14em;font-size:11px;font-weight:500;}
+  .eyebrow{display:inline-flex;align-items:center;gap:9px;color:var(--lilac);margin-bottom:22px;}
+  .eyebrow .pulse{width:7px;height:7px;border-radius:50%;background:var(--red);box-shadow:0 0 0 0 rgba(229,74,89,.5);animation:pulse 2.4s infinite;}
+  @keyframes pulse{0%{box-shadow:0 0 0 0 rgba(229,74,89,.5);}70%{box-shadow:0 0 0 9px rgba(229,74,89,0);}100%{box-shadow:0 0 0 0 rgba(229,74,89,0);}}
+
+  /* intro */
+  .intro h1{font-size:clamp(31px,5.2vw,50px);max-width:28ch;}
+  .intro h1 em{font-style:normal;color:var(--red);white-space:nowrap;}
+  .intro h1 .nb{white-space:nowrap;}
+  .intro .sub{font-size:clamp(16px,2vw,19px);color:#D8D3EC;max-width:54ch;margin-top:22px;}
+  .meta{display:flex;flex-wrap:wrap;gap:10px;margin:30px 0 34px;}
+  .pill{display:inline-flex;align-items:center;gap:8px;border:1px solid var(--line-dark);border-radius:999px;padding:9px 15px;font-size:13px;color:#E4E0F2;background:rgba(255,255,255,.03);}
+  .pill b{color:var(--lilac);font-family:var(--mono);font-size:11px;letter-spacing:.06em;}
+  .foot{margin-top:26px;color:var(--muted-dark);font-size:13px;max-width:52ch;}
+
+  .btn{font-family:var(--body);font-size:14px;letter-spacing:-0.005em;font-weight:600;padding:14px 26px;border-radius:9px;border:1px solid transparent;cursor:pointer;display:inline-flex;align-items:center;gap:10px;transition:filter .2s,transform .15s,border-color .2s,color .2s;}
+  .btn--primary{background:var(--red);color:#fff;}
+  .btn--primary:hover{filter:brightness(1.1);transform:translateY(-1px);}
+  .btn--ghost{background:transparent;color:#fff;border-color:rgba(255,255,255,.28);}
+  .btn--ghost:hover{border-color:var(--lilac);color:var(--lilac);}
+  .btn:disabled{opacity:.45;cursor:not-allowed;transform:none;box-shadow:none;}
+
+  /* worry opener */
+  .worry h2{font-size:clamp(28px,4.6vw,42px);max-width:15ch;}
+  .worry .lead{color:#D8D3EC;font-size:17px;margin-top:14px;max-width:48ch;}
+  .worry-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-top:34px;}
+  .worry-card{position:relative;text-align:left;cursor:pointer;color:#fff;background:rgba(255,255,255,.04);border:1px solid var(--line-dark);border-radius:15px;padding:24px 22px 22px;transition:transform .18s,border-color .18s,background .18s;display:flex;flex-direction:column;gap:10px;min-height:184px;}
+  .worry-card::before{content:"";position:absolute;top:0;left:0;right:0;height:3px;background:var(--red);transform:scaleX(0);transform-origin:left;transition:transform .25s;border-radius:15px 15px 0 0;}
+  .worry-card:hover{transform:translateY(-4px);border-color:var(--lilac);background:rgba(176,168,254,.08);}
+  .worry-card:hover::before{transform:scaleX(1);}
+  .worry-card:focus-visible{outline:3px solid var(--blue-bright);outline-offset:3px;}
+  .worry-card .ic{font-size:22px;}
+  .worry-card .wt{font-family:var(--display);font-weight:800;font-size:19px;line-height:1.12;}
+  .worry-card .wd{font-size:13.5px;color:var(--muted-dark);}
+  .worry-card .go{margin-top:auto;font-family:var(--mono);font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--lilac);}
+
+  /* progress + question */
+  .prog{display:flex;align-items:center;gap:16px;margin-bottom:28px;}
+  .prog .bar{flex:1;height:6px;border-radius:999px;background:rgba(255,255,255,.10);overflow:hidden;}
+  .prog .fill{height:100%;width:0;border-radius:999px;background:linear-gradient(90deg,var(--blue-bright),var(--red));transition:width .45s cubic-bezier(.4,0,.2,1);}
+  .prog .count{font-family:var(--mono);font-size:11px;letter-spacing:.12em;color:var(--muted-dark);white-space:nowrap;}
+  .prog .count b{color:#fff;}
+  .q-pillar{font-family:var(--mono);text-transform:uppercase;letter-spacing:.14em;font-size:10.5px;color:var(--lilac);margin-bottom:14px;display:flex;align-items:center;gap:8px;}
+  .q-pillar .sq{width:7px;height:7px;border-radius:2px;background:var(--red);transform:rotate(45deg);}
+  .q-title{font-size:clamp(22px,3.4vw,31px);max-width:24ch;}
+  .q-help{color:var(--muted-dark);font-size:14.5px;margin-top:12px;max-width:52ch;}
+  .opts{display:flex;flex-direction:column;gap:11px;margin-top:28px;}
+  .opt{display:flex;align-items:flex-start;gap:15px;text-align:left;width:100%;cursor:pointer;background:rgba(255,255,255,.035);border:1px solid var(--line-dark);border-radius:13px;padding:17px 18px;color:#fff;transition:border-color .18s,background .18s,transform .12s;}
+  .opt:hover{border-color:var(--lilac);background:rgba(176,168,254,.08);transform:translateX(3px);}
+  .opt:focus-visible{outline:3px solid var(--blue-bright);outline-offset:2px;}
+  .opt.sel{border-color:var(--red);background:rgba(229,74,89,.12);}
+  .opt .mk{flex:none;width:24px;height:24px;border-radius:7px;border:1.5px solid var(--muted-dark);display:grid;place-items:center;margin-top:1px;transition:all .18s;font-size:13px;color:transparent;}
+  .opt.sel .mk{background:var(--red);border-color:var(--red);color:#fff;}
+  .opt .ot{font-family:var(--display);font-weight:700;font-size:16px;}
+  .opt .od{font-size:13.5px;color:var(--muted-dark);margin-top:3px;}
+  .q-nav{display:flex;align-items:center;justify-content:space-between;margin-top:26px;}
+  .back{background:none;border:none;color:var(--muted-dark);font-family:var(--mono);font-size:11px;letter-spacing:.1em;text-transform:uppercase;cursor:pointer;display:inline-flex;gap:7px;align-items:center;padding:6px 0;}
+  .back:hover{color:#fff;} .back[hidden]{visibility:hidden;}
+
+  /* results */
+  .res .eyebrow{justify-content:flex-start;}
+  .res h2{font-size:clamp(26px,4vw,38px);max-width:20ch;}
+  .res .quad{color:#D8D3EC;font-size:16.5px;margin-top:14px;max-width:54ch;}
+  .gauges{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:30px;}
+  .gauge{background:rgba(255,255,255,.04);border:1px solid var(--line-dark);border-radius:var(--radius);padding:22px;text-align:center;}
+  .ring{position:relative;width:150px;height:150px;margin:0 auto;}
+  .ring svg{transform:rotate(-90deg);}
+  .ring .track{fill:none;stroke:rgba(255,255,255,.10);stroke-width:13;}
+  .ring .meter{fill:none;stroke-width:13;stroke-linecap:round;stroke-dasharray:0 999;transition:stroke-dasharray 1.3s cubic-bezier(.2,.7,.2,1);}
+  .ring .ctr{position:absolute;inset:0;display:grid;place-content:center;}
+  .ring .pct{font-family:var(--display);font-weight:800;font-size:38px;line-height:1;}
+  .ring .pct span{font-size:18px;}
+  .gauge .glabel{font-family:var(--display);font-weight:700;font-size:16px;margin-top:14px;}
+  .gauge .gsub{font-family:var(--mono);font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted-dark);margin-top:4px;}
+
+  .value{margin-top:16px;background:linear-gradient(120deg,rgba(176,168,254,.10),rgba(229,74,89,.08));border:1px solid var(--line-dark);border-radius:var(--radius);padding:22px 24px;}
+  .value .vlbl{font-family:var(--mono);font-size:10.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--lilac);}
+  .value .vnum{font-family:var(--display);font-weight:800;font-size:clamp(26px,4vw,36px);margin-top:6px;}
+  .value .vnum span{color:var(--lilac);}
+  .value .vnote{color:var(--muted-dark);font-size:12.5px;margin-top:8px;}
+  .value details{margin-top:10px;} .value summary{cursor:pointer;color:var(--lilac);font-size:12.5px;font-family:var(--mono);letter-spacing:.04em;}
+  .value details p{color:var(--muted-dark);font-size:12.5px;margin-top:8px;line-height:1.5;}
+
+  /* weak link gated */
+  .weak{position:relative;margin-top:16px;border:1px solid var(--line-dark);border-radius:var(--radius);overflow:hidden;}
+  .weak-inner{padding:26px;transition:filter .5s ease;}
+  .weak-inner.locked{position:absolute;inset:0;filter:blur(11px);user-select:none;pointer-events:none;}
+  .weak-tag{font-family:var(--mono);font-size:10.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--red-bright);display:flex;align-items:center;gap:8px;margin-bottom:12px;}
+  .weak-name{font-family:var(--display);font-weight:800;font-size:23px;}
+  .weak-diag{color:#E4E0F2;font-size:15px;margin-top:10px;}
+  .weak-move{color:#D8D3EC;font-size:15px;margin-top:12px;}
+  .weak-move b{color:var(--lilac);}
+  .weak-gate{position:relative;display:flex;flex-direction:column;justify-content:center;min-height:260px;padding:30px 26px;background:rgba(21,15,46,.55);backdrop-filter:blur(2px);}
+  .weak-gate.hide{display:none;}
+  .gate-lock{display:inline-flex;align-items:center;gap:9px;font-family:var(--mono);font-size:10.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--lilac);margin-bottom:8px;}
+  .gate-h{font-family:var(--display);font-weight:800;font-size:clamp(20px,3vw,26px);max-width:22ch;}
+  .gate-sub{color:var(--muted-dark);font-size:14px;margin-top:8px;max-width:46ch;}
+  .gate-form{display:grid;grid-template-columns:1fr 1fr;gap:11px;margin-top:18px;}
+  .field{display:flex;flex-direction:column;}
+  .field.full{grid-column:1 / -1;}
+  .field input{width:100%;padding:12px 14px;border:1px solid var(--line-dark);border-radius:9px;font:inherit;font-size:14px;background:rgba(255,255,255,.06);color:#fff;transition:border-color .18s;}
+  .field input::placeholder{color:#8A82AB;}
+  .field input:focus{outline:none;border-color:var(--lilac);}
+  .field.invalid input{border-color:var(--red);}
+  .gate-foot{display:flex;align-items:center;gap:14px;margin-top:14px;flex-wrap:wrap;}
+  .gate-note{color:var(--muted-dark);font-size:11.5px;max-width:40ch;}
+
+  /* next steps */
+  .next{margin-top:16px;background:rgba(255,255,255,.04);border:1px solid var(--line-dark);border-radius:var(--radius);padding:24px;display:none;}
+  .next.show{display:block;animation:fade .5s ease;}
+  .next h3{font-size:18px;margin-bottom:8px;}
+  .next .into{color:var(--muted-dark);font-size:14px;margin-bottom:14px;}
+  .next ul{list-style:none;padding:0;margin:0;display:flex;flex-direction:column;gap:11px;}
+  .next li{display:flex;gap:12px;font-size:14.5px;color:#E4E0F2;}
+  .next li .t{flex:none;width:21px;height:21px;border-radius:6px;background:rgba(31,157,110,.16);color:var(--positive);display:grid;place-items:center;font-size:11px;font-weight:700;margin-top:1px;}
+  .cta-row{display:flex;flex-wrap:wrap;gap:11px;margin-top:20px;}
+  .cta-soft{display:inline-flex;align-items:center;gap:9px;border:1px solid var(--line-dark);border-radius:9px;padding:13px 17px;font-size:13.5px;color:#fff;background:rgba(255,255,255,.03);transition:all .18s;cursor:pointer;text-decoration:none;}
+  .cta-soft:hover{border-color:var(--lilac);background:rgba(176,168,254,.08);}
+  .cta-soft .mono{color:var(--muted-dark);}
+
+  .res-actions{display:flex;gap:11px;flex-wrap:wrap;justify-content:center;margin-top:22px;}
+  .res-actions .cta-soft{cursor:pointer;}
+  .footnote{position:relative;z-index:2;text-align:center;color:#6F6796;font-size:11.5px;padding:0 24px 26px;max-width:640px;margin:0 auto;}
+
+  @media(max-width:600px){
+    .worry-grid{grid-template-columns:1fr;}
+    .gauges{grid-template-columns:1fr;}
+    .gate-form{grid-template-columns:1fr;}
+    .top{padding:16px 18px;} .stage{padding:16px 16px 44px;}
+    .btn{width:100%;justify-content:center;}
+  }
+  @media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important;}}
+
+  .logo-img { height: 28px; width: auto; max-width: 160px; display: block; flex-shrink: 0; object-fit: contain; }
+</style>
+</head>
+<body>
+<div class="bgrid"></div>
+
+<header class="top">
+  <img src="logow.png" alt="Tezo" class="logo-img">
+  <span class="tag">RFQ &amp; Order Automation · Machinery</span>
+</header>
+
+<main class="stage">
+  <div class="card">
+
+    <!-- INTRO -->
+    <section class="view intro active" id="v-intro">
+      <span class="eyebrow"><span class="pulse"></span><span class="mono">90-second self-discovery · No sign-up to start</span></span>
+      <h1>You already know something<br>needs to get better. <em>Let’s name it.</em></h1>
+      <p class="sub">If you’re on this page, you already know something in your <b style="color:#fff;font-weight:700;">quote-to-cash flow is costing you</b>. We just haven’t had the chance to round it up. Answer a few, and we’ll show you where your opportunity and readiness really stand, and the one thing to fix first.</p>
+      <div class="meta">
+        <span class="pill"><b>8</b> sharp questions</span>
+        <span class="pill"><b>~90</b> seconds</span>
+        <span class="pill"><b>Opportunity</b> &amp; readiness, scored</span>
+        <span class="pill"><b>Your</b> weak link, named</span>
+      </div>
+      <button class="btn btn--primary" id="startBtn">Begin →</button>
+      <p class="foot">No pitch. Built from Tezo’s work with machinery and industrial manufacturers across the US. Your answers generate your result and nothing else.</p>
+    </section>
+
+    <!-- WORRY OPENER -->
+    <section class="view worry" id="v-worry">
+      <span class="eyebrow"><span class="pulse"></span><span class="mono">First, the honest question</span></span>
+      <h2>When it comes to RFQs and orders, I worry most about…</h2>
+      <p class="lead">Pick the one that lands hardest. There’s no wrong answer — it just tells us where to look.</p>
+      <div class="worry-grid" id="worryGrid">
+        <button class="worry-card" data-path="losing">
+          <span class="ic">📉</span>
+          <span class="wt">We’re losing winnable orders</span>
+          <span class="wd">Quotes go out slow; deals slip to whoever answered first.</span>
+          <span class="go">This one →</span>
+        </button>
+        <button class="worry-card" data-path="manual">
+          <span class="ic">⚙️</span>
+          <span class="wt">We’re buried in manual work</span>
+          <span class="wd">Reading, rekeying and fixing every order by hand.</span>
+          <span class="go">This one →</span>
+        </button>
+        <button class="worry-card" data-path="both">
+          <span class="ic">💸</span>
+          <span class="wt">Margin’s leaking at both ends</span>
+          <span class="wd">Speed and manual effort are both costing us.</span>
+          <span class="go">This one →</span>
+        </button>
+      </div>
+    </section>
+
+    <!-- QUESTION -->
+    <section class="view" id="v-q">
+      <div class="prog">
+        <span class="count">Q<b id="qNum">1</b> / <span id="qTot">8</span></span>
+        <div class="bar"><div class="fill" id="progFill"></div></div>
+        <span class="count" id="progPct">0%</span>
+      </div>
+      <div class="q-pillar"><span class="sq"></span><span id="qDim">—</span></div>
+      <h2 class="q-title" id="qTitle"></h2>
+      <p class="q-help" id="qHelp"></p>
+      <div class="opts" id="qOpts"></div>
+      <div class="q-nav">
+        <button class="back" id="backBtn"><span>←</span> Back</button>
+        <span class="count mono" style="color:var(--muted-dark)">Tap an answer to continue</span>
+      </div>
+    </section>
+
+    <!-- RESULTS -->
+    <section class="view res" id="v-res">
+      <span class="eyebrow"><span class="pulse"></span><span class="mono" id="resTag">Here’s what your answers reveal</span></span>
+      <h2 id="resHead">Your quote-to-cash snapshot</h2>
+      <p class="quad" id="resQuad"></p>
+
+      <div class="gauges">
+        <div class="gauge">
+          <div class="ring">
+            <svg width="150" height="150" viewBox="0 0 150 150"><circle class="track" cx="75" cy="75" r="64"></circle><circle class="meter" id="oppMeter" cx="75" cy="75" r="64" stroke="#E54A59"></circle></svg>
+            <div class="ctr"><div class="pct" id="oppPct2">0<span>%</span></div></div>
+          </div>
+          <div class="glabel">Opportunity</div>
+          <div class="gsub">The prize at stake</div>
+        </div>
+        <div class="gauge">
+          <div class="ring">
+            <svg width="150" height="150" viewBox="0 0 150 150"><circle class="track" cx="75" cy="75" r="64"></circle><circle class="meter" id="readMeter" cx="75" cy="75" r="64" stroke="#6e57d9"></circle></svg>
+            <div class="ctr"><div class="pct" id="readPct2">0<span>%</span></div></div>
+          </div>
+          <div class="glabel">Readiness</div>
+          <div class="gsub">Your runway to capture it</div>
+        </div>
+      </div>
+
+      <div class="value">
+        <div class="vlbl">Indicative value at stake</div>
+        <div class="vnum" id="valNum">—</div>
+        <div class="vnote">A directional estimate from your answers and machinery benchmarks — not a quote. We pin the real figure in a working session.</div>
+        <details><summary>How we estimate this</summary>
+          <p id="valHow"></p>
+        </details>
+      </div>
+
+      <div class="weak">
+        <div class="weak-inner locked" id="weakInner">
+          <div class="weak-tag"><span>◆</span> The weak link · fix this first</div>
+          <div class="weak-name" id="weakName">—</div>
+          <div class="weak-diag" id="weakDiag"></div>
+          <div class="weak-move" id="weakMove"></div>
+        </div>
+        <div class="weak-gate" id="weakGate">
+          <span class="gate-lock">🔒 One step to unlock your weak link</span>
+          <div class="gate-h">We found the single area to fix first. Where should we send it?</div>
+          <p class="gate-sub">See it now on this screen, and we’ll email the full breakdown — your scores, your weak link, and a prioritized first move.</p>
+          <div class="gate-form">
+            <div class="field"><input id="g-name" type="text" placeholder="Full name" autocomplete="name"></div>
+            <div class="field"><input id="g-company" type="text" placeholder="Company" autocomplete="organization"></div>
+            <div class="field full"><input id="g-email" type="email" placeholder="Work email" autocomplete="email"></div>
+          </div>
+          <div class="gate-foot">
+            <button class="btn btn--primary" id="unlockBtn">Unlock my weak link →</button>
+            <span class="gate-note">No pitch. Opt out anytime. Your answers stay private.</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="next" id="nextBox">
+        <h3 id="nextTitle">What happens next</h3>
+        <p class="into" id="nextInto"></p>
+        <ul>
+          <li><span class="t">✓</span><span><b>Your full report</b> — both scores, your weak link in context, and what good looks like — is on its way to your inbox.</span></li>
+          <li><span class="t">✓</span><span><b>A prioritized first move</b> you can action whether or not we ever speak.</span></li>
+          <li><span class="t">✓</span><span><b>A reference sketch</b> for your ERP/CRM/CPQ stack, so IT can sanity-check the path.</span></li>
+        </ul>
+        <div class="cta-row">
+          <a class="cta-soft" id="ctaCall" href="https://calendly.com/tezo-machinery/quote-to-cash-diagnostic" target="_blank" rel="noopener"><span>📅</span><span>Talk it through with a vertical expert <span class="mono">· 30 min, no pitch</span></span></a>
+          <a class="cta-soft" id="ctaLI" href="https://www.linkedin.com/in/rupeshbkumar/" target="_blank" rel="noopener"><span>in</span><span>Connect with an expert on LinkedIn</span></a>
+        </div>
+      </div>
+
+      <div class="res-actions">
+        <button class="cta-soft" id="retakeBtn"><span>↻</span><span>Retake the assessment</span></button>
+        <button class="cta-soft" id="shareBtn"><span>🔗</span><span id="shareLabel">Share this assessment</span></button>
+      </div>
+
+      <p class="footnote" style="margin-top:24px;">Directional guidance, not a formal audit. The value range is indicative and based on the answers you gave plus industry benchmarks.</p>
+    </section>
+
+  </div>
+</main>
+
+<script>
+/* =====================================================================
+   RFQ & Order Automation — Self-Discovery (branching, Akinator-style)
+   Opener routes to one of 3 distinct paths. Each path = 8 questions
+   mapping to the same 8 dimensions (D1–D8) so results stay comparable.
+   D1–D4 -> Opportunity pillar (pain).  D5–D8 -> Readiness pillar.
+   Weak link = the single weakest dimension. Value band is indicative.
+   ===================================================================== */
+
+var DIMS = {
+  D1:{name:'Quote & RFQ speed', pillar:'opp'},
+  D2:{name:'Intake & channel load', pillar:'opp'},
+  D3:{name:'Order validation & accuracy', pillar:'opp'},
+  D4:{name:'Pricing & margin control', pillar:'opp'},
+  D5:{name:'Data foundation', pillar:'read'},
+  D6:{name:'System integration', pillar:'read'},
+  D7:{name:'Data quality', pillar:'read'},
+  D8:{name:'Process rules & governance', pillar:'read'}
+};
+/* weak-link diagnosis + first move per dimension */
+var WEAK = {
+  D1:{diag:'Quote turnaround is your tightest constraint. In configured-machinery deals the first credible quote often wins — and speed is where you’re most exposed today.',
+      move:'put guided CPQ on your existing rules so standard configurations quote the same day.'},
+  D2:{diag:'Your intake is the choke point — too many formats and too much volume hitting people instead of a system before anything can move.',
+      move:'automate capture from email, PDF, EDI and portals into one structured queue before it ever reaches a person.'},
+  D3:{diag:'Order validation and manual entry are where errors are born — and they surface late, in production or shipping, where they’re expensive and visible to the customer.',
+      move:'validate every line against the configured BOM automatically, with exception-only human review.'},
+  D4:{diag:'Pricing and margin control is your soft spot — quotes and discounts go out without anyone seeing the real margin until it’s too late.',
+      move:'surface live margin at the point of quote, with guardrails and thresholds on discounting.'},
+  D5:{diag:'Your data foundation is what’s holding everything else back — there’s no single trusted source for automation or analytics to stand on.',
+      move:'consolidate product, pricing and customer data into one governed model first.'},
+  D6:{diag:'System integration is the weak link — ERP, CRM and CPQ aren’t sharing, so people move data by hand between them.',
+      move:'connect the two systems whose disconnect hurts most (usually ERP↔CRM) through one governed layer.'},
+  D7:{diag:'Data quality is what will trip up any automation you attempt — inconsistent records produce confident, wrong outputs.',
+      move:'establish master data and reconciliation for product, pricing and customer records.'},
+  D8:{diag:'Your rules live in people’s heads, which caps how much you can safely automate or scale.',
+      move:'codify quoting, pricing and approval rules into the system so they’re enforced, not remembered.'}
+};
+/* tie-break priority when health is equal (earlier = higher urgency) */
+var WEAK_PRIORITY = ['D3','D6','D5','D1','D4','D7','D2','D8'];
+
+/* option fields: t=title, d=detail, p=points(0..3 toward dim pillar),
+   vol (orders/mo) on D2 options, aov ($) on D4 options */
+var PATHS = {
+ losing:[
+  {dim:'D1',q:'How often does your quote reach the buyer later than you’d like?',sub:'Be honest — typical, not best case.',
+   opts:[{t:'Rarely — we’re fast',d:'We’re usually first to respond.',p:0},{t:'Now and then',d:'A few slip past the ideal window.',p:1},{t:'Often — it’s a known issue',d:'Speed comes up in losses.',p:2},{t:'We’re usually last to the table',d:'By the time we quote, they’ve moved on.',p:3}]},
+  {dim:'D2',q:'How many RFQs and quotes does your team field in a month?',sub:'Across every channel and product line.',
+   opts:[{t:'Under 50',d:'Low volume, high-touch deals.',p:0,vol:25},{t:'50–250',d:'Steady mid-market flow.',p:1,vol:150},{t:'250–1,000',d:'High, repeatable demand.',p:2,vol:600},{t:'1,000+',d:'Volume is the story.',p:3,vol:1500}]},
+  {dim:'D3',q:'How often does a deal go sideways from a wrong config, spec or quote error?',sub:'The kind a customer notices.',
+   opts:[{t:'Almost never',d:'Our quotes are tight.',p:0},{t:'Occasionally',d:'The odd slip.',p:1},{t:'More than we’d admit',d:'It costs us credibility.',p:2},{t:'Errors cost us deals regularly',d:'Rework and lost trust.',p:3}]},
+  {dim:'D4',q:'When an order is on the line, what’s a typical value at stake?',sub:'A representative deal, not your biggest.',
+   opts:[{t:'Under $10K',d:'Smaller, frequent orders.',p:0,aov:6000},{t:'$10K–$50K',d:'Mid-size configured orders.',p:1,aov:28000},{t:'$50K–$250K',d:'Significant builds.',p:2,aov:140000},{t:'$250K+',d:'Major capital orders.',p:3,aov:400000}]},
+  {dim:'D5',q:'When you ask “why did we win or lose that one?”, can the data answer?',sub:'Quickly, and the same answer twice.',
+   opts:[{t:'Yes — it’s all in one place',d:'A trusted, central source.',p:3},{t:'Mostly, with some digging',d:'It’s there if you hunt.',p:2},{t:'Only partially',d:'Pieces in different systems.',p:1},{t:'Not really — it’s anecdotal',d:'We go on gut and memory.',p:0}]},
+  {dim:'D6',q:'Does your CRM know what your ERP and floor know about lead times and stock?',sub:'Where your reps actually work.',
+   opts:[{t:'Yes — in real time',d:'One connected view.',p:3},{t:'Mostly connected',d:'A few gaps.',p:2},{t:'A couple of links',d:'Point-to-point only.',p:1},{t:'They live in separate worlds',d:'Reps promise; the floor can’t confirm.',p:0}]},
+  {dim:'D7',q:'How trustworthy are your pricing, product and customer records across systems?',sub:'The data a quote depends on.',
+   opts:[{t:'Clean and governed',d:'Managed master data.',p:3},{t:'Mostly reliable',d:'Good in the areas that matter.',p:2},{t:'Known issues',d:'We clean up reactively.',p:1},{t:'Duplicates & mismatches everywhere',d:'No one fully trusts it.',p:0}]},
+  {dim:'D8',q:'Could a new rep quote correctly without a veteran looking over their shoulder?',sub:'A fair test of whether rules are real.',
+   opts:[{t:'Yes — it’s all in the system',d:'Rules are codified.',p:3},{t:'Mostly',d:'Light guidance needed.',p:2},{t:'Only with help',d:'They lean on the experienced few.',p:1},{t:'No — it’s in people’s heads',d:'Tribal knowledge runs it.',p:0}]}
+ ],
+ manual:[
+  {dim:'D1',q:'From RFQ in to order confirmed — how long does it really take?',sub:'End to end, on a normal week.',
+   opts:[{t:'Same day',d:'Under 24 hours.',p:0},{t:'1–3 business days',d:'Quick, with the odd delay.',p:1},{t:'4–7 business days',d:'A week is normal.',p:2},{t:'Over a week / unpredictable',d:'Hard to promise a date.',p:3}]},
+  {dim:'D2',q:'How many orders and RFQs does your team key in each month?',sub:'Everything that passes through hands.',
+   opts:[{t:'Under 50',d:'Low volume.',p:0,vol:25},{t:'50–250',d:'Steady flow.',p:1,vol:150},{t:'250–1,000',d:'Heavy, repeatable load.',p:2,vol:600},{t:'1,000+',d:'Relentless volume.',p:3,vol:1500}]},
+  {dim:'D3',q:'Of reading, validating, pricing and entering an order — how many are done by hand?',sub:'The four core steps.',
+   opts:[{t:'None — automated',d:'Straight-through today.',p:0},{t:'1 of 4',d:'Mostly automated.',p:1},{t:'2–3 of 4',d:'A person drives most of it.',p:2},{t:'All 4',d:'Entirely manual, every order.',p:3}]},
+  {dim:'D4',q:'What’s the typical value of an order your team keys in by hand?',sub:'So we can size what that effort is guarding.',
+   opts:[{t:'Under $10K',d:'Smaller, frequent orders.',p:0,aov:6000},{t:'$10K–$50K',d:'Mid-size orders.',p:1,aov:28000},{t:'$50K–$250K',d:'Significant orders.',p:2,aov:140000},{t:'$250K+',d:'Major orders.',p:3,aov:400000}]},
+  {dim:'D5',q:'Is there one trusted place your operational data lands — or many?',sub:'For reporting and reconciliation.',
+   opts:[{t:'Yes — one central source',d:'Warehouse / lake in place.',p:3},{t:'Partly consolidated',d:'Some domains, not all.',p:2},{t:'Planned, not live',d:'On the roadmap.',p:1},{t:'No — it’s scattered',d:'Apps and spreadsheets.',p:0}]},
+  {dim:'D6',q:'Do ERP, CRM, CPQ and pricing share data automatically?',sub:'Or does someone move it between them?',
+   opts:[{t:'Fully integrated',d:'Via a platform layer.',p:3},{t:'Most are integrated',d:'A few gaps remain.',p:2},{t:'A couple are linked',d:'Point-to-point.',p:1},{t:'Mostly disconnected',d:'Re-keyed by hand.',p:0}]},
+  {dim:'D7',q:'How often does someone have to fix data before it can be used?',sub:'Cleaning before the real work starts.',
+   opts:[{t:'Rarely — it’s clean',d:'Governed and consistent.',p:3},{t:'Sometimes',d:'Occasional touch-ups.',p:2},{t:'Often',d:'A regular tax on the team.',p:1},{t:'Constant cleanup',d:'It never ends.',p:0}]},
+  {dim:'D8',q:'Are your order and pricing rules codified in systems, or carried by people?',sub:'What happens when the expert is out?',
+   opts:[{t:'Codified & enforced',d:'Built into the systems.',p:3},{t:'Documented & mostly followed',d:'Clear and applied.',p:2},{t:'Some documented, often bypassed',d:'Written but skipped.',p:1},{t:'Carried by people',d:'Tribal knowledge.',p:0}]}
+ ],
+ both:[
+  {dim:'D1',q:'When a quote is slow, where do you feel it — lost deals, overtime, or both?',sub:'The honest answer.',
+   opts:[{t:'Neither — we’re quick',d:'Speed isn’t our issue.',p:0},{t:'A little overtime',d:'We catch up by working harder.',p:1},{t:'Lost deals sometimes',d:'Speed shows up in losses.',p:2},{t:'Both, regularly',d:'It costs us deals and hours.',p:3}]},
+  {dim:'D2',q:'How many RFQs and orders flow through your team each month?',sub:'Across all channels.',
+   opts:[{t:'Under 50',d:'Low volume.',p:0,vol:25},{t:'50–250',d:'Steady flow.',p:1,vol:150},{t:'250–1,000',d:'High and repeatable.',p:2,vol:600},{t:'1,000+',d:'Very high volume.',p:3,vol:1500}]},
+  {dim:'D3',q:'How much of order entry is manual — and how often does it bite you?',sub:'Effort and error, together.',
+   opts:[{t:'Automated, rarely bites',d:'Clean and hands-off.',p:0},{t:'Some manual, occasional issues',d:'Mostly fine.',p:1},{t:'Mostly manual, regular issues',d:'Errors recur.',p:2},{t:'All manual, costly errors',d:'Rework is routine.',p:3}]},
+  {dim:'D4',q:'What’s your average order value?',sub:'So we can size what’s at stake.',
+   opts:[{t:'Under $10K',d:'Smaller, frequent orders.',p:0,aov:6000},{t:'$10K–$50K',d:'Mid-size orders.',p:1,aov:28000},{t:'$50K–$250K',d:'Significant orders.',p:2,aov:140000},{t:'$250K+',d:'Major capital orders.',p:3,aov:400000}]},
+  {dim:'D5',q:'Could you trust a dashboard built on today’s data?',sub:'Without caveats.',
+   opts:[{t:'Yes — completely',d:'One trusted source.',p:3},{t:'Mostly',d:'With a little context.',p:2},{t:'Only in places',d:'Some domains, not all.',p:1},{t:'Not really',d:'Too fragmented to trust.',p:0}]},
+  {dim:'D6',q:'How connected are your ERP, CRM and CPQ?',sub:'In practice, not on the architecture diagram.',
+   opts:[{t:'Fully integrated',d:'They share automatically.',p:3},{t:'Most are integrated',d:'A few gaps.',p:2},{t:'A couple are linked',d:'Point-to-point.',p:1},{t:'Largely disconnected',d:'People bridge them.',p:0}]},
+  {dim:'D7',q:'How clean is the data that pricing and quoting depend on?',sub:'Product, price, customer.',
+   opts:[{t:'Standardized & governed',d:'Master data managed.',p:3},{t:'Mostly consistent',d:'Good where it counts.',p:2},{t:'Known issues',d:'Cleaned reactively.',p:1},{t:'Inconsistent',d:'Duplicates and mismatches.',p:0}]},
+  {dim:'D8',q:'Are discounts and pricing rules enforced by the system, or by goodwill?',sub:'When the pressure’s on.',
+   opts:[{t:'Enforced by the system',d:'Guardrails are real.',p:3},{t:'Mostly followed',d:'Documented and applied.',p:2},{t:'Loosely applied',d:'Bent under pressure.',p:1},{t:'By goodwill',d:'It depends who’s asking.',p:0}]}
+ ]
+};
+
+var QUAD = {
+  hh:'There’s a real prize here, and you’re built to capture it — this is an execution conversation, not a transformation program.',
+  hl:'The prize is real, but a little foundation work comes first so the gains actually stick.',
+  lh:'You’re in good shape — the wins here are refinement and quick, contained automations.',
+  ll:'Early days, which is exactly where the largest, most durable upside lives once the fundamentals are in place.'
+};
+
+var state = { path:null, idx:0, ans:[] };
+var V = {intro:document.getElementById('v-intro'),worry:document.getElementById('v-worry'),q:document.getElementById('v-q'),res:document.getElementById('v-res')};
+function show(v){Object.keys(V).forEach(function(k){V[k].classList.remove('active');});v.classList.add('active');window.scrollTo({top:0,behavior:'smooth'});}
+
+document.getElementById('startBtn').addEventListener('click',function(){show(V.worry);});
+document.querySelectorAll('#worryGrid .worry-card').forEach(function(c){
+  c.addEventListener('click',function(){ state.path=c.dataset.path; state.idx=0; state.ans=new Array(8).fill(null); renderQ(); show(V.q); });
+});
+
+function qset(){ return PATHS[state.path]; }
+function renderQ(){
+  var q=qset()[state.idx];
+  document.getElementById('qNum').textContent=state.idx+1;
+  document.getElementById('qDim').textContent=DIMS[q.dim].name;
+  document.getElementById('qTitle').textContent=q.q;
+  document.getElementById('qHelp').textContent=q.sub;
+  var pct=Math.round(state.idx/8*100);
+  document.getElementById('progFill').style.width=pct+'%';
+  document.getElementById('progPct').textContent=pct+'%';
+  document.getElementById('backBtn').hidden=(state.idx===0);
+  var wrap=document.getElementById('qOpts'); wrap.innerHTML='';
+  q.opts.forEach(function(o,i){
+    var b=document.createElement('button'); b.type='button';
+    b.className='opt'+(state.ans[state.idx]===i?' sel':'');
+    b.innerHTML='<span class="mk">✓</span><span><span class="ot">'+o.t+'</span><span class="od">'+o.d+'</span></span>';
+    b.addEventListener('click',function(){ pick(i); });
+    wrap.appendChild(b);
+  });
+}
+function pick(i){
+  state.ans[state.idx]=i;
+  document.querySelectorAll('#qOpts .opt').forEach(function(el,idx){el.classList.toggle('sel',idx===i);});
+  setTimeout(function(){
+    if(state.idx<7){ state.idx++; renderQ(); }
+    else { document.getElementById('progFill').style.width='100%'; document.getElementById('progPct').textContent='100%'; computeAndShow(); show(V.res); }
+  },300);
+}
+document.getElementById('backBtn').addEventListener('click',function(){ if(state.idx>0){state.idx--;renderQ();} });
+
+/* ---- scoring ---- */
+function compute(){
+  var qs=qset(), oppPts=0,readPts=0, vol=0,aov=0, health={};
+  qs.forEach(function(q,i){
+    var o=q.opts[state.ans[i]];
+    if(DIMS[q.dim].pillar==='opp'){ oppPts+=o.p; health[q.dim]=3-o.p; }
+    else { readPts+=o.p; health[q.dim]=o.p; }
+    if(o.vol) vol=o.vol;
+    if(o.aov) aov=o.aov;
+  });
+  var oppPct=Math.round(oppPts/12*100), readPct=Math.round(readPts/12*100);
+  // weak link = lowest health; tie-break by priority order
+  var weak=null,best=99;
+  WEAK_PRIORITY.forEach(function(d){ if(health[d]!==undefined && health[d]<best){best=health[d];weak=d;} });
+  // value band (indicative). Conservative leak rate, capped so extreme
+  // volume×value combinations stay believable (shown with a "+").
+  var annualRev=vol*12*aov;
+  var leak=0.01+(oppPct/100)*0.025;           // 1.0%–3.5% of quote-to-cash throughput
+  var mid=annualRev*leak, low=mid*0.6, high=mid*1.0;
+  var CAP=25e6, plus=false;
+  if(high>CAP){ high=CAP; plus=true; if(low>15e6) low=15e6; }
+  // quadrant
+  var hiO=oppPct>=55, hiR=readPct>=55;
+  var quad = hiO?(hiR?QUAD.hh:QUAD.hl):(hiR?QUAD.lh:QUAD.ll);
+  return {oppPct:oppPct,readPct:readPct,weak:weak,low:low,high:high,plus:plus,mid:mid,leak:leak,vol:vol,aov:aov,annualRev:annualRev,quad:quad};
+}
+function fmt(n){ n=Math.round(n); if(n>=1e6) return '$'+(Math.round(n/1e5)/10)+'M'; if(n>=1e3) return '$'+Math.round(n/1e3)+'K'; return '$'+n; }
+
+var R=null;
+function computeAndShow(){
+  R=compute();
+  ringTo('oppMeter','oppPct2',R.oppPct,'#E54A59');
+  ringTo('readMeter','readPct2',R.readPct,'#6e57d9');
+  document.getElementById('resQuad').textContent=R.quad;
+  document.getElementById('valNum').innerHTML=fmt(R.low)+' <span>–</span> '+fmt(R.high)+(R.plus?'+':'')+' <span style="font-size:.6em;color:var(--muted-dark)">/ yr</span>';
+  document.getElementById('valHow').textContent=
+    'We take your monthly volume ('+R.vol+'/mo) and average order value ('+fmt(R.aov)+'), and apply a quote-to-cash leakage rate of '+(R.leak*100).toFixed(1)+'% — scaled by your Opportunity score and grounded in machinery benchmarks (manual handling, rework of 3–5% of order value, expedite freight, and unguided-discount margin loss). It’s a range on purpose; the real figure depends on your mix.';
+  // fill weak link (stays blurred until unlock)
+  var w=WEAK[R.weak];
+  document.getElementById('weakName').textContent=DIMS[R.weak].name;
+  document.getElementById('weakDiag').textContent=w.diag;
+  document.getElementById('weakMove').innerHTML='<b>Where we’d start:</b> '+w.move.charAt(0).toUpperCase()+w.move.slice(1);
+}
+function ringTo(meterId,pctId,pct,color){
+  var m=document.getElementById(meterId); var C=2*Math.PI*64;
+  m.style.stroke=color;
+  requestAnimationFrame(function(){ m.style.strokeDasharray=(C*pct/100)+' '+C; });
+  var el=document.getElementById(pctId); var start=performance.now();
+  function step(now){var p=Math.min((now-start)/1100,1);var e=1-Math.pow(1-p,3);el.innerHTML=Math.round(e*pct)+'<span>%</span>';if(p<1)requestAnimationFrame(step);}
+  requestAnimationFrame(step);
+}
+
+/* ---- unlock (lead capture) ---- */
+function validEmail(e){return /^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(e);}
+
+/* HubSpot integration — keeps our own form markup/styling and just
+   posts the captured fields to the HubSpot Forms API so submissions
+   land in the connected CRM properties (First Name, Company Name, Email). */
+var HUBSPOT_PORTAL_ID='242046967';
+var HUBSPOT_FORM_ID='8697aedb-9c13-45af-bb62-6d3106b1b0af';
+function getCookie(name){
+  var m=document.cookie.match('(?:^|; )'+name+'=([^;]*)');
+  return m?decodeURIComponent(m[1]):null;
+}
+function submitToHubSpot(name,company,email){
+  var url='https://api.hsforms.com/submissions/v3/integration/submit/'+HUBSPOT_PORTAL_ID+'/'+HUBSPOT_FORM_ID;
+  var body={
+    fields:[
+      {name:'firstname',value:name},
+      {name:'company',value:company},
+      {name:'email',value:email}
+    ],
+    context:{ pageUri:window.location.href, pageName:document.title }
+  };
+  var hutk=getCookie('hubspotutk');
+  if(hutk) body.context.hutk=hutk;
+  return fetch(url,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});
+}
+
+document.getElementById('unlockBtn').addEventListener('click',function(){
+  var name=document.getElementById('g-name').value.trim();
+  var company=document.getElementById('g-company').value.trim();
+  var email=document.getElementById('g-email').value.trim();
+  var ok=true;
+  [['g-name',name.length>1],['g-company',company.length>1],['g-email',validEmail(email)]].forEach(function(p){
+    document.getElementById(p[0]).parentElement.classList.toggle('invalid',!p[1]); if(!p[1])ok=false;
+  });
+  if(!ok) return;
+
+  var btn=this; var originalLabel=btn.textContent;
+  btn.disabled=true; btn.textContent='Unlocking…';
+
+  function reveal(){
+    document.getElementById('weakInner').classList.remove('locked');
+    document.getElementById('weakGate').classList.add('hide');
+    document.getElementById('resTag').textContent='Thanks, '+name.split(' ')[0]+' — here’s your weak link';
+    var nb=document.getElementById('nextBox'); nb.classList.add('show');
+    document.getElementById('nextInto').textContent='We’ve emailed the full breakdown to '+email+'. While it lands, here’s the shape of what’s coming:';
+    nb.scrollIntoView({behavior:'smooth',block:'nearest'});
+    btn.disabled=false; btn.textContent=originalLabel;
+  }
+
+  submitToHubSpot(name,company,email)
+    .then(function(res){ if(window.console) console.log('[Tezo self-discovery] HubSpot submit',res.status); })
+    .catch(function(err){ if(window.console) console.error('[Tezo self-discovery] HubSpot submit failed',err); })
+    .then(reveal);
+});
+
+/* ---- retake & share ---- */
+function resetAll(){
+  state.path=null; state.idx=0; state.ans=[]; R=null;
+  document.getElementById('weakInner').classList.add('locked');
+  document.getElementById('weakGate').classList.remove('hide');
+  document.getElementById('nextBox').classList.remove('show');
+  ['g-name','g-company','g-email'].forEach(function(id){var el=document.getElementById(id);el.value='';el.parentElement.classList.remove('invalid');});
+  ['oppMeter','readMeter'].forEach(function(id){document.getElementById(id).style.strokeDasharray='0 999';});
+  document.getElementById('oppPct2').innerHTML='0<span>%</span>';
+  document.getElementById('readPct2').innerHTML='0<span>%</span>';
+  document.getElementById('resTag').textContent='Here’s what your answers reveal';
+  document.getElementById('progFill').style.width='0%';
+  document.getElementById('progPct').textContent='0%';
+}
+document.getElementById('retakeBtn').addEventListener('click',function(){ resetAll(); show(V.intro); });
+document.getElementById('shareBtn').addEventListener('click',function(){
+  var url=location.href.split('#')[0];
+  var label=document.getElementById('shareLabel');
+  function done(){ var old=label.textContent; label.textContent='Link copied ✓'; setTimeout(function(){label.textContent=old;},2200); }
+  if(navigator.clipboard && navigator.clipboard.writeText){
+    navigator.clipboard.writeText(url).then(done).catch(fallback);
+  } else { fallback(); }
+  function fallback(){
+    try{ var t=document.createElement('textarea'); t.value=url; t.style.position='fixed'; t.style.opacity='0'; document.body.appendChild(t); t.select(); document.execCommand('copy'); document.body.removeChild(t); done(); }
+    catch(e){ label.textContent='Copy: '+url; }
+  }
+});
+
+window.__tz={compute:compute,PATHS:PATHS,DIMS:DIMS,WEAK:WEAK,state:state,fmt:fmt,resetAll:resetAll};
+</script>
+</body>
+</html>
