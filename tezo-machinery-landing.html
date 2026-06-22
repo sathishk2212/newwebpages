@@ -705,50 +705,11 @@
       </div>
 
       <div class="reveal">
-        <div class="panel">
+        <div class="panel" style="display:flex;flex-direction:column;">
           <div class="panel-head">
             <span class="mono">Diagnostic booking</span>
-            <div class="steps-dots"><i id="d1" class="on"></i><i id="d2"></i><i id="d3"></i></div>
           </div>
-
-          <div class="stepview active" id="view-spec">
-            <h3>Pick your specialist</h3>
-            <div class="spec-list" id="specList"></div>
-          </div>
-
-          <div class="stepview" id="view-cal">
-            <button class="back-btn" id="backToSpec">← Change specialist</button>
-            <div class="chosen" id="chosenSpec"></div>
-            <div class="cal-head">
-              <button class="cal-nav" id="prevMonth" aria-label="Previous month">‹</button>
-              <span class="mlabel" id="monthLabel"></span>
-              <button class="cal-nav" id="nextMonth" aria-label="Next month">›</button>
-            </div>
-            <div class="cal-grid" id="calGrid"></div>
-            <div class="slots" id="slotBlock" style="display:none;">
-              <div class="lbl" id="slotLabel">Available times</div>
-              <div class="slot-grid" id="slotGrid"></div>
-            </div>
-          </div>
-
-          <div class="stepview" id="view-confirm">
-            <button class="back-btn" id="backToCal">← Pick another time</button>
-            <h3>Confirm your diagnostic</h3>
-            <div class="confirm-summary" id="confirmSummary"></div>
-            <div class="field">
-              <label for="email">Work email — where we send the invite &amp; pre-read</label>
-              <input type="email" id="email" placeholder="name@company.com" autocomplete="email">
-            </div>
-            <button class="btn btn-primary btn-full" id="confirmBtn" style="margin-top:18px;">Confirm booking →</button>
-          </div>
-
-          <div class="stepview" id="view-done">
-            <div class="success">
-              <div class="ok">✓</div>
-              <h3>Your diagnostic is held.</h3>
-              <p id="doneMsg"></p>
-            </div>
-          </div>
+          <iframe src="https://bookings.cloud.microsoft/book/Tezotest@Technovert.com/?ismsaljsauthenabled=true" style="width:100%;flex:1;min-height:520px;border:none;border-radius:10px;" title="Book a diagnostic"></iframe>
         </div>
       </div>
     </div>
@@ -780,11 +741,7 @@
         <p>Integration over replacement. We extend your ERP, CRM and data platform rather than forcing a migration you didn't ask for.</p>
       </div>
     </div>
-    <div class="integrations reveal">
-      <div class="lbl mono">Connects across your stack</div>
-      <p class="sublbl">The platforms where machinery margin actually leaks — across order automation, RFQ &amp; CPQ, and ERP–CRM integration. Spot yours.</p>
-      <div id="logoWall"></div>
-    </div>
+    <div id="logoWall" style="display:none;"></div>
   </div>
 </section>
 
