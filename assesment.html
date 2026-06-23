@@ -28,22 +28,23 @@
   --muted:        #8a92b2;
   --muted-2:      #6b7290;
 
-  --primary:      #e54a59;
-  --secondary:    #4e3aad;
-  --accent:       #b0a8fe;
-  --violet:       #4e3aad;
-  --violet-2:     #b0a8fe;
-  --blue:         #4e3aad;
-  --blue-2:       #b0a8fe;
-  --cyan:         #22d3ee;
+  --primary:      #EC1B5B;
+  --primary-2:    #ff5d86;
+  --secondary:    #8f0f38;
+  --accent:       #ff7da0;
+  --violet:       #c01550;
+  --violet-2:     #ff7da0;
+  --blue:         #c01550;
+  --blue-2:       #ff7da0;
+  --cyan:         #ff7da0;
   --green:        #22c55e;
   --amber:        #f59e0b;
   --red:          #ef4444;
 
-  --grad:         linear-gradient(135deg,#e54a59 0%, #4e3aad 100%);
-  --grad-soft:    linear-gradient(135deg, rgba(139,92,246,.16), rgba(59,130,246,.16));
+  --grad:         linear-gradient(135deg,#EC1B5B 0%, #8f0f38 100%);
+  --grad-soft:    linear-gradient(135deg, rgba(236,27,91,.18), rgba(236,27,91,.10));
 
-  --shadow:       0 18px 50px rgba(0,0,0,.45), 0 2px 10px rgba(139,92,246,.10);
+  --shadow:       0 18px 50px rgba(0,0,0,.45), 0 2px 10px rgba(236,27,91,.12);
 }
 *{box-sizing:border-box}
 html,body{margin:0;padding:0;background:var(--bg);color:var(--ink);font-family:'Inter',system-ui,-apple-system,Segoe UI,Roboto,sans-serif;-webkit-font-smoothing:antialiased;height:100%;overflow:hidden}
@@ -55,9 +56,9 @@ button{font-family:inherit}
 body::before{
   content:"";position:fixed;inset:0;z-index:-2;pointer-events:none;
   background:
-    radial-gradient(900px 600px at 12% -10%, rgba(139,92,246,.22), transparent 60%),
-    radial-gradient(800px 600px at 105% 10%, rgba(59,130,246,.20), transparent 60%),
-    radial-gradient(600px 400px at 50% 110%, rgba(34,211,238,.10), transparent 60%);
+    radial-gradient(900px 600px at 12% -10%, rgba(236,27,91,.22), transparent 60%),
+    radial-gradient(800px 600px at 105% 10%, rgba(236,27,91,.20), transparent 60%),
+    radial-gradient(600px 400px at 50% 110%, rgba(236,27,91,.10), transparent 60%);
 }
 body::after{
   content:"";position:fixed;inset:0;z-index:-1;pointer-events:none;opacity:.40;
@@ -87,9 +88,9 @@ body::after{
 }
 .brand{display:flex;align-items:center;gap:14px}
 .brand-logo{
-  width:42px;height:42px;border-radius:13px;background:var(--grad);
+  width:42px;height:42px;border-radius:13px;background:#0f0f0f;
   display:flex;align-items:center;justify-content:center;font-weight:800;color:#fff;letter-spacing:.5px;
-  box-shadow:0 8px 28px rgba(139,92,246,.35), inset 0 0 0 1px rgba(255,255,255,.18);
+  box-shadow:0 8px 24px rgba(236,27,91,.22), inset 0 0 0 1px rgba(236,27,91,.20);
   position:relative;font-family:'Inter',sans-serif;font-size:14px
 }
 .brand-logo::after{content:"";position:absolute;right:-3px;bottom:-3px;width:13px;height:13px;background:var(--green);border:2px solid var(--bg);border-radius:50%;box-shadow:0 0 12px rgba(34,197,94,.6)}
@@ -100,7 +101,7 @@ body::after{
 
 /* Top progress bar */
 .top-progress{position:relative;height:3px;background:rgba(255,255,255,.06);overflow:hidden;flex-shrink:0}
-.top-progress .bar{position:absolute;inset:0;width:0%;background:#e54a59;transition:width .4s cubic-bezier(.22,.61,.36,1);box-shadow:none}
+.top-progress .bar{position:absolute;inset:0;width:0%;background:#EC1B5B;transition:width .4s cubic-bezier(.22,.61,.36,1);box-shadow:none}
 
 /* ============== STAGE (single, swappable, no scroll) ============== */
 .stage{
@@ -175,7 +176,7 @@ body::after{
 .qtag{
   display:inline-flex;align-items:center;gap:6px;
   font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;
-  color:var(--violet-2);background:rgba(139,92,246,.10);border:1px solid rgba(139,92,246,.25);
+  color:var(--violet-2);background:rgba(236,27,91,.10);border:1px solid rgba(236,27,91,.25);
   padding:4px 10px;border-radius:99px;margin-bottom:12px
 }
 .qtag .dot{width:5px;height:5px;background:var(--violet-2);border-radius:50%;box-shadow:0 0 8px var(--violet-2);animation:pulse 2s infinite}
@@ -188,7 +189,7 @@ body::after{
   position:absolute;top:14px;left:50%;transform:translateX(-50%);
   background:var(--grad);color:#fff;font-weight:700;font-size:12px;
   padding:6px 14px;border-radius:99px;
-  box-shadow:0 10px 26px rgba(139,92,246,.32), inset 0 0 0 1px rgba(255,255,255,.15);
+  box-shadow:0 10px 26px rgba(236,27,91,.32), inset 0 0 0 1px rgba(255,255,255,.15);
   opacity:0;animation:floatUp 1.6s ease;
   pointer-events:none;z-index:6;white-space:nowrap
 }
@@ -207,15 +208,20 @@ body::after{
 @keyframes blink{0%,80%,100%{opacity:.25;transform:translateY(0)}40%{opacity:1;transform:translateY(-3px)}}
 
 /* ============== Composer (rating dock) ============== */
+/* Question + answers grouped together, centered in the stage */
+#questionScene{justify-content:center;padding-top:0;overflow-y:auto}
+.q-flow{max-width:680px;width:100%;margin:0 auto;display:flex;flex-direction:column}
+/* answers sit a comfortable gap below the question, aligned under the bubble */
 .composer{
-  flex-shrink:0;
-  background:#000000;
-  border-top:1px solid var(--border);
-  padding:14px 22px 16px;
-  backdrop-filter:blur(14px);
+  margin-top:26px;
+  margin-left:62px;
+  background:transparent;
+  border:none;
+  padding:0;
   position:relative;z-index:5
 }
-.composer-inner{max-width:760px;margin:0 auto}
+@media (max-width:560px){.composer{margin-left:0}}
+.composer-inner{width:100%}
 .composer-label{
   font-size:11px;color:var(--muted);font-weight:700;letter-spacing:.07em;text-transform:uppercase;
   display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;
@@ -225,21 +231,29 @@ body::after{
   font-size:11px;display:inline-flex;align-items:center;gap:5px;padding:5px 10px;border-radius:99px;
   text-transform:none;letter-spacing:0
 }
-.composer-label .info-toggle:hover{background:rgba(59,130,246,.10);border-color:rgba(59,130,246,.35)}
+.composer-label .info-toggle:hover{background:rgba(236,27,91,.10);border-color:rgba(236,27,91,.35)}
 
 .rating{display:flex;gap:8px;flex-wrap:wrap}
 .rating button{
-  flex:1;min-width:88px;border:1px solid var(--border-2);background:rgba(255,255,255,.03);color:var(--ink);
+  --opt:#EC1B5B;
+  flex:1;min-width:88px;
+  border:1px solid color-mix(in srgb, var(--opt) 38%, transparent);
+  background:color-mix(in srgb, var(--opt) 9%, transparent);
+  color:var(--opt);
   font-weight:800;font-size:18px;padding:14px 0 12px;border-radius:14px;cursor:pointer;
   transition:all .14s ease;position:relative;letter-spacing:-.01em
 }
 .rating button .lab{display:block;font-size:10.5px;font-weight:600;color:var(--muted);margin-top:4px;text-transform:uppercase;letter-spacing:.06em}
-.rating button:hover{border-color:var(--violet);transform:translateY(-2px);box-shadow:0 12px 30px rgba(139,92,246,.18);background:rgba(139,92,246,.06)}
-.rating button.active{
-  background:#e54a59;color:#fff;border-color:transparent;
-  box-shadow:0 16px 36px rgba(139,92,246,.42), inset 0 0 0 1px rgba(255,255,255,.2)
+.rating button:hover{
+  border-color:var(--opt);transform:translateY(-2px);
+  box-shadow:0 12px 30px color-mix(in srgb, var(--opt) 30%, transparent);
+  background:color-mix(in srgb, var(--opt) 16%, transparent)
 }
-.rating button.active .lab{color:rgba(255,255,255,.85)}
+.rating button.active{
+  background:var(--opt);color:#fff;border-color:transparent;
+  box-shadow:0 16px 36px color-mix(in srgb, var(--opt) 45%, transparent), inset 0 0 0 1px rgba(255,255,255,.22)
+}
+.rating button.active .lab{color:rgba(255,255,255,.88)}
 
 /* Inline option-detail popover */
 .opt-details{
@@ -275,18 +289,18 @@ body::after{
   font-size:13.5px;font-family:inherit;color:#fff;transition:all .15s
 }
 .intro-form input::placeholder{color:var(--muted-2)}
-.intro-form input:focus,.intro-form select:focus{outline:none;border-color:var(--violet);background:rgba(139,92,246,.07);box-shadow:0 0 0 3px rgba(139,92,246,.18)}
-.intro-form select option{background:#0a0d24;color:#fff}
+.intro-form input:focus,.intro-form select:focus{outline:none;border-color:var(--violet);background:rgba(236,27,91,.07);box-shadow:0 0 0 3px rgba(236,27,91,.18)}
+.intro-form select option{background:#0d0d0d;color:#fff}
 .intro-form .start-row{display:flex;justify-content:flex-end;margin-top:6px}
 .btn-primary{
-  background:#e54a59;color:#fff;font-weight:700;border:none;padding:11px 22px;border-radius:11px;cursor:pointer;font-size:13.5px;letter-spacing:.01em;
+  background:#EC1B5B;color:#fff;font-weight:700;border:none;padding:11px 22px;border-radius:11px;cursor:pointer;font-size:13.5px;letter-spacing:.01em;
   box-shadow:none
 }
 .btn-primary:hover{transform:translateY(-1px);box-shadow:none}
 
 .intro-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:6px}
 .intro-stat{background:var(--surface);border:1px solid var(--border);border-radius:11px;padding:8px 10px;text-align:center}
-.intro-stat b{display:block;font-size:16px;font-weight:800;color:#e54a59;background:none;-webkit-text-fill-color:unset;}
+.intro-stat b{display:block;font-size:16px;font-weight:800;color:#EC1B5B;background:none;-webkit-text-fill-color:unset;}
 .intro-stat span{display:block;font-size:10px;color:var(--muted);font-weight:600;text-transform:uppercase;letter-spacing:.05em;margin-top:2px}
 
 /* Resume floating prompt */
@@ -311,21 +325,21 @@ body::after{
 }
 .summary.show{display:block;animation:fadeUp .35s ease}
 .summary-hero{
-  background:linear-gradient(135deg,#11142e 0%, #181c44 100%);
+  background:linear-gradient(135deg,#121212 0%, #1c0d14 100%);
   border:1px solid var(--border-2);
   color:#fff;border-radius:20px;padding:22px;margin-bottom:16px;
   display:grid;grid-template-columns:1fr auto;gap:16px;align-items:center;
   position:relative;overflow:hidden
 }
-.summary-hero::before{content:"";position:absolute;inset:0;background:radial-gradient(600px 400px at 100% 0%, rgba(139,92,246,.20), transparent 60%);pointer-events:none}
+.summary-hero::before{content:"";position:absolute;inset:0;background:radial-gradient(600px 400px at 100% 0%, rgba(236,27,91,.20), transparent 60%);pointer-events:none}
 .summary-hero h2{margin:0 0 4px;font-size:21px;letter-spacing:-.015em}
 .summary-hero .org{font-size:13px;color:var(--ink-2);font-weight:600}
 .score-circle{
   width:130px;height:130px;border-radius:50%;background:conic-gradient(var(--violet) 0deg, rgba(255,255,255,.10) 0deg);
   display:flex;align-items:center;justify-content:center;position:relative;
-  box-shadow:0 24px 60px rgba(139,92,246,.25)
+  box-shadow:0 24px 60px rgba(236,27,91,.25)
 }
-.score-circle::before{content:"";position:absolute;inset:8px;border-radius:50%;background:#0d1130}
+.score-circle::before{content:"";position:absolute;inset:8px;border-radius:50%;background:#0d0d0d}
 .score-num{position:relative;font-size:36px;font-weight:800;letter-spacing:-.02em;text-align:center;color:#fff}
 .score-num small{display:block;font-size:10px;font-weight:600;color:var(--muted);letter-spacing:.08em;margin-top:2px}
 .verdict{display:inline-block;padding:5px 12px;border-radius:99px;font-size:11px;font-weight:800;letter-spacing:.06em;text-transform:uppercase;margin-top:8px;color:#0a0d24}
@@ -340,7 +354,7 @@ body::after{
 .domain-row:last-child{border-bottom:none}
 .domain-name{font-size:12.5px;font-weight:600;color:#fff}
 .domain-bar{height:9px;background:rgba(255,255,255,.06);border-radius:99px;position:relative}
-.domain-bar .fill{height:100%;border-radius:99px;background:var(--grad);box-shadow:0 0 14px rgba(139,92,246,.4)}
+.domain-bar .fill{height:100%;border-radius:99px;background:var(--grad);box-shadow:0 0 14px rgba(236,27,91,.4)}
 .domain-bar .marker{position:absolute;top:-3px;height:15px;width:2px;background:#fff;opacity:.4}
 .domain-bar .marker.best{background:var(--green);opacity:.85;box-shadow:0 0 6px var(--green)}
 .domain-stats{font-size:11px;color:var(--muted);min-width:90px;text-align:right;font-variant-numeric:tabular-nums}
@@ -369,17 +383,17 @@ body::after{
 .recommend li::marker{color:var(--violet-2)}
 
 .cta{
-  background:linear-gradient(135deg, #1a1f48 0%, #2b1a52 100%);
+  background:linear-gradient(135deg, #141414 0%, #25101a 100%);
   border:1px solid var(--border-2);
   color:#fff;border-radius:18px;padding:22px;margin-bottom:14px;
   display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:14px;
   position:relative;overflow:hidden
 }
-.cta::before{content:"";position:absolute;inset:0;background:radial-gradient(500px 300px at 0% 100%, rgba(59,130,246,.20), transparent 60%);pointer-events:none}
+.cta::before{content:"";position:absolute;inset:0;background:radial-gradient(500px 300px at 0% 100%, rgba(236,27,91,.20), transparent 60%);pointer-events:none}
 .cta h3{margin:0 0 4px;font-size:16px;font-weight:700}
 .cta p{margin:0;font-size:13px;color:var(--ink-2)}
 .cta .cta-actions{display:flex;gap:8px;flex-wrap:wrap;position:relative;z-index:1}
-.cta .btn-light{background:#e54a59;color:#fff;padding:11px 16px;border-radius:11px;font-weight:700;font-size:13px;border:none;cursor:pointer}
+.cta .btn-light{background:#EC1B5B;color:#fff;padding:11px 16px;border-radius:11px;font-weight:700;font-size:13px;border:none;cursor:pointer}
 .cta .btn-light:hover{background:#f0f2ff;box-shadow:0 8px 22px rgba(255,255,255,.18)}
 .cta .btn-outline-light{background:transparent;color:#fff;border:1px solid rgba(255,255,255,.40);padding:11px 16px;border-radius:11px;font-weight:600;font-size:13px;cursor:pointer;text-decoration:none;display:inline-block}
 .cta .btn-outline-light:hover{background:rgba(255,255,255,.08);text-decoration:none}
@@ -394,8 +408,8 @@ canvas{max-width:100%}
 #pdfStage .pdf-sub{font-size:12px;color:#5b6b85;margin-bottom:14px}
 #pdfStage table{width:100%;border-collapse:collapse;font-size:11px}
 #pdfStage th,#pdfStage td{border:1px solid #e3e8f1;padding:6px 8px;text-align:left}
-#pdfStage th{background:#f4f0ff;color:#3b1f74}
-#pdfStage .pdf-hero{background:linear-gradient(135deg, #2b1a52, #1a1f48);color:#fff;padding:18px;border-radius:12px;display:flex;justify-content:space-between;align-items:center}
+#pdfStage th{background:#fdeaf1;color:#a01047}
+#pdfStage .pdf-hero{background:linear-gradient(135deg, #18181b, #3a0f22);color:#fff;padding:18px;border-radius:12px;display:flex;justify-content:space-between;align-items:center}
 #pdfStage .pdf-hero .big{font-size:38px;font-weight:800}
 
 /* Compact mobile tweaks for stage so question fits without scroll */
@@ -478,9 +492,27 @@ canvas{max-width:100%}
 
     <!-- Question scene (content rendered dynamically) -->
     <section class="scene" id="questionScene">
-      <div class="q-card">
-        <div class="avatar tezo-avatar"></div>
-        <div class="bubble" id="qBubble"></div>
+      <div class="q-flow">
+        <div class="q-card">
+          <div class="avatar tezo-avatar"></div>
+          <div class="bubble" id="qBubble"></div>
+        </div>
+
+        <!-- Answer options — sit directly under the question -->
+        <div class="composer hidden" id="composer">
+          <div class="composer-inner">
+            <div class="composer-label">
+              <span id="composerLabel">Tap your score — auto-advances</span>
+              <button class="info-toggle" id="infoToggle" type="button">ⓘ What do these levels mean?</button>
+            </div>
+            <div class="rating" id="ratingBar"></div>
+            <div class="opt-details" id="optDetails"><ul id="optDetailsList"></ul></div>
+            <div class="composer-foot">
+              <button class="btn-back" id="backBtn">← Previous question</button>
+              <span id="autoNote">Auto-advance enabled</span>
+            </div>
+          </div>
+        </div>
       </div>
     </section>
 
@@ -502,22 +534,6 @@ canvas{max-width:100%}
     <div id="resumeHost"></div>
   </main>
 
-  <!-- ============== Composer (rating dock) ============== -->
-  <div class="composer hidden" id="composer">
-    <div class="composer-inner">
-      <div class="composer-label">
-        <span id="composerLabel">Tap your score — auto-advances</span>
-        <button class="info-toggle" id="infoToggle" type="button">ⓘ What do these levels mean?</button>
-      </div>
-      <div class="rating" id="ratingBar"></div>
-      <div class="opt-details" id="optDetails"><ul id="optDetailsList"></ul></div>
-      <div class="composer-foot">
-        <button class="btn-back" id="backBtn">← Previous question</button>
-        <span id="autoNote">Auto-advance enabled</span>
-      </div>
-    </div>
-  </div>
-
   <!-- ============== Summary view (replaces stage) ============== -->
   <section class="summary" id="summaryView">
     <div class="summary-hero">
@@ -537,7 +553,7 @@ canvas{max-width:100%}
         <h3>Domain readiness — you vs. benchmarks</h3>
         <canvas id="radarChart" height="320"></canvas>
         <div class="legend">
-          <span><i style="background:#8b5cf6"></i> Your score</span>
+          <span><i style="background:#EC1B5B"></i> Your score</span>
           <span><i style="background:#f59e0b"></i> Industry median</span>
           <span><i style="background:#22c55e"></i> Best practice</span>
         </div>
@@ -689,6 +705,8 @@ const QUESTIONS = [
 ];
 
 const RATING_LABELS = ["Not at all","Initial","Developing","Established","Leading"];
+/* Maturity scale: 0 = red … 4 = green, with gradient steps between */
+const SCALE_COLORS  = ["#e5484d","#f2711c","#e0a82e","#9bbf2e","#22c55e"];
 
 /* ---------- State ---------- */
 const STATE_KEY = "tezo_ai_readiness_bot_v4";
@@ -848,6 +866,7 @@ function renderComposer(){
   for (let s=0; s<=4; s++){
     const b = document.createElement("button");
     b.type = "button";
+    b.style.setProperty("--opt", SCALE_COLORS[s]);
     b.className = state.answers[i] === s ? "active" : "";
     b.innerHTML = `${s}<span class="lab">${RATING_LABELS[s]}</span>`;
     b.addEventListener("click", () => choose(s));
@@ -858,7 +877,7 @@ function renderComposer(){
   list.innerHTML = "";
   q.info.forEach((txt, idx) => {
     const li = document.createElement("li");
-    li.innerHTML = `<b class="num">${idx}</b><span><b class="lvl">${RATING_LABELS[idx]}</b> — ${escapeHtml(txt)}</span>`;
+    li.innerHTML = `<b class="num" style="background:${SCALE_COLORS[idx]};color:#fff;border-color:transparent">${idx}</b><span><b class="lvl">${RATING_LABELS[idx]}</b> — ${escapeHtml(txt)}</span>`;
     list.appendChild(li);
   });
 
@@ -959,7 +978,7 @@ function showSummary(){
     data: {
       labels: domainData.map(d => d.name.replace(" & ","\n& ")),
       datasets: [
-        { label:"Your score", data:domainData.map(d=>d.score), backgroundColor:"rgba(139,92,246,.20)", borderColor:"#8b5cf6", borderWidth:2, pointBackgroundColor:"#8b5cf6" },
+        { label:"Your score", data:domainData.map(d=>d.score), backgroundColor:"rgba(236,27,91,.20)", borderColor:"#EC1B5B", borderWidth:2, pointBackgroundColor:"#EC1B5B" },
         { label:"Industry median", data:domainData.map(d=>d.benchmark), backgroundColor:"rgba(245,158,11,.10)", borderColor:"#f59e0b", borderWidth:1.5, borderDash:[6,4], pointBackgroundColor:"#f59e0b" },
         { label:"Best practice", data:domainData.map(d=>d.best), backgroundColor:"rgba(34,197,94,.08)", borderColor:"#22c55e", borderWidth:1.5, borderDash:[2,3], pointBackgroundColor:"#22c55e" }
       ]
@@ -1069,7 +1088,7 @@ $("downloadPdfBtn")?.addEventListener("click", async () => {
     </div>
 
     <div style="margin-top:16px">
-      <h3 style="margin:0 0 6px;font-size:14px;color:#3b1f74">Domain readiness</h3>
+      <h3 style="margin:0 0 6px;font-size:14px;color:#a01047">Domain readiness</h3>
       <table>
         <thead><tr><th>#</th><th>Domain</th><th>Your score</th><th>Industry median</th><th>Best practice</th><th>Gap</th></tr></thead>
         <tbody>
@@ -1085,7 +1104,7 @@ $("downloadPdfBtn")?.addEventListener("click", async () => {
     </div>
 
     <div style="margin-top:14px">
-      <h3 style="margin:0 0 6px;font-size:14px;color:#3b1f74">Where to focus</h3>
+      <h3 style="margin:0 0 6px;font-size:14px;color:#a01047">Where to focus</h3>
       <ul style="margin:0;padding-left:18px;font-size:12px;line-height:1.6">
         ${generateRecommendations(domainData).map(r=>`<li>${escapeHtml(r)}</li>`).join("")}
       </ul>
