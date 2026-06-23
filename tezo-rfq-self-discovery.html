@@ -544,11 +544,22 @@ function getCookie(name){
 }
 function submitToHubSpot(name,company,email){
   var url='https://api.hsforms.com/submissions/v3/integration/submit/'+HUBSPOT_PORTAL_ID+'/'+HUBSPOT_FORM_ID;
+  var valLabel=fmt(R.low)+' – '+fmt(R.high)+(R.plus?'+':'')+' / yr';
+  var w=WEAK[R.weak];
+  var firstMove=w.move.charAt(0).toUpperCase()+w.move.slice(1);
   var body={
     fields:[
       {name:'firstname',value:name},
       {name:'company',value:company},
-      {name:'email',value:email}
+      {name:'email',value:email},
+      {name:'assessment_opportunity',value:String(R.oppPct)},
+      {name:'assessment_readiness',value:String(R.readPct)},
+      {name:'assessment_weak_link_name',value:DIMS[R.weak].name},
+      {name:'assessment_weak_link_diagnosis',value:w.diag},
+      {name:'assessment_weak_link_first_move',value:firstMove},
+      {name:'assessment_value_label',value:valLabel},
+      {name:'assessment_quad_line',value:R.quad},
+      {name:'assessment_path',value:state.path}
     ],
     context:{ pageUri:window.location.href, pageName:document.title }
   };
