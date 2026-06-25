@@ -539,7 +539,6 @@ function validEmail(e){return /^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(e);}
 var HUBSPOT_PORTAL_ID='242046967';
 var HUBSPOT_FORM_ID='8697aedb-9c13-45af-bb62-6d3106b1b0af';
 
-/* UTM capture */
 function getUTM(){
   var p=new URLSearchParams(window.location.search);
   return {
@@ -549,6 +548,7 @@ function getUTM(){
   };
 }
 var UTM=getUTM();
+
 function getCookie(name){
   var m=document.cookie.match('(?:^|; )'+name+'=([^;]*)');
   return m?decodeURIComponent(m[1]):null;
