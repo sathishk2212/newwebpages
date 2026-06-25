@@ -8,6 +8,17 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+<!-- Surya this is new add this in code -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-CFBMBNSVPX"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'G-CFBMBNSVPX');
+</script>
+
+
 <script src="https://js-na2.hsforms.net/forms/embed/242046967.js" defer></script>
 <style>
 :root{
@@ -636,8 +647,19 @@ function onScroll(){
 window.addEventListener("scroll", onScroll, {passive:true});
 window.addEventListener("resize", onScroll);
 
-/* Booking modal */
+/* Surya is new add this in code */
+
 const HUBSPOT = { portalId:"242046967", formGuid:"f3b14d49-3b0f-4061-9c8c-8ae2b61a6c2e" };
+function getUTM(){
+  var p=new URLSearchParams(window.location.search);
+  return {
+    source:   p.get('utm_source')   || '',
+    medium:   p.get('utm_medium')   || '',
+    campaign: p.get('utm_campaign') || ''
+  };
+}
+var UTM=getUTM();
+
 const modal = $("#modal");
 function openModal(){
   $("#modalFormWrap").classList.remove("hidden");
@@ -670,9 +692,12 @@ $("#leadForm").addEventListener("submit", async e => {
   setInvalid("lf_company", !company); setInvalid("lf_title", !title); setInvalid("lf_ind", !ind);
   if(!name || !emailOk || !company || !title || !ind) return;
 
+/* Surya this is new add this in code */
+
   if(HUBSPOT.formGuid){
     const fields=[["firstname",name],["email",email],["company",company],["jobtitle",title],
-      ["industryai",ind],["mobilephone",$("#lf_phone").value.trim()],["message",$("#lf_msg").value.trim()]]
+      ["industryai",ind],["mobilephone",$("#lf_phone").value.trim()],["message",$("#lf_msg").value.trim()],
+      ["utm_source",UTM.source],["utm_medium",UTM.medium],["utm_campaign",UTM.campaign]]
       .filter(f=>f[1]).map(f=>({name:f[0],value:f[1]}));
     try{ await fetch("https://api.hsforms.com/submissions/v3/integration/submit/"+HUBSPOT.portalId+"/"+HUBSPOT.formGuid,
       {method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({fields})}); }
