@@ -538,6 +538,17 @@ function validEmail(e){return /^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(e);}
    land in the connected CRM properties (First Name, Company Name, Email). */
 var HUBSPOT_PORTAL_ID='242046967';
 var HUBSPOT_FORM_ID='8697aedb-9c13-45af-bb62-6d3106b1b0af';
+
+/* UTM capture */
+function getUTM(){
+  var p=new URLSearchParams(window.location.search);
+  return {
+    source:   p.get('utm_source')   || '',
+    medium:   p.get('utm_medium')   || '',
+    campaign: p.get('utm_campaign') || ''
+  };
+}
+var UTM=getUTM();
 function getCookie(name){
   var m=document.cookie.match('(?:^|; )'+name+'=([^;]*)');
   return m?decodeURIComponent(m[1]):null;
@@ -559,7 +570,10 @@ function submitToHubSpot(name,company,email){
       {name:'assessment_weak_link_first_move',value:firstMove},
       {name:'assessment_value_label',value:valLabel},
       {name:'assessment_quad_line',value:R.quad},
-      {name:'assessment_path',value:state.path}
+      {name:'assessment_path',value:state.path},
+      {name:'utm_source',value:UTM.source},
+      {name:'utm_medium',value:UTM.medium},
+      {name:'utm_campaign',value:UTM.campaign}
     ],
     context:{ pageUri:window.location.href, pageName:document.title }
   };

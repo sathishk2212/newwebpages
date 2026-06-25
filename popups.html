@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Tezo — AI Readiness Advisor · 3 site placements (preview)</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+/* ===== Preview-only chrome (NOT part of the drop-in components) ===== */
+:root{--tz-pink:#EC1B5B;--tz-pink-2:#ff5d86;--tz-soft:rgba(236,27,91,.12);--ink:#fff;--ink2:#c9cee0;--muted:#8b92ad;--border:rgba(255,255,255,.10);--border2:rgba(255,255,255,.18)}
+*{box-sizing:border-box}
+body{margin:0;background:#070707;color:var(--ink);font-family:'Inter',system-ui,-apple-system,sans-serif;-webkit-font-smoothing:antialiased}
+.pv-note{max-width:980px;margin:0 auto;padding:26px 24px 6px}
+.pv-note h1{font-size:20px;font-weight:800;margin:0 0 6px}
+.pv-note p{color:var(--muted);font-size:13.5px;margin:0;line-height:1.6}
+.pv-block{max-width:1180px;margin:0 auto;padding:34px 24px}
+.pv-label{display:inline-flex;align-items:center;gap:9px;font-size:12px;font-weight:800;letter-spacing:.04em;color:var(--tz-pink-2);margin-bottom:14px}
+.pv-label b{display:inline-flex;align-items:center;justify-content:center;width:24px;height:24px;border-radius:50%;background:var(--tz-soft);border:1px solid rgba(236,27,91,.35);color:var(--tz-pink-2);font-size:12px}
+.pv-cap{color:var(--muted);font-size:12.5px;margin:12px 0 0}
+.pv-frame{border:1px solid var(--border);border-radius:16px;overflow:hidden;background:#000;position:relative}
+.pv-sep{height:1px;background:var(--border);max-width:1180px;margin:0 auto}
+
+/* Mock Tezo header (preview context only) */
+.mk-hdr{display:flex;align-items:center;justify-content:space-between;padding:18px 30px;background:#000;border-bottom:1px solid rgba(255,255,255,.06)}
+.mk-logo{display:flex;align-items:center;gap:11px;font-size:24px;font-weight:800;letter-spacing:-.02em}
+.mk-mark{width:34px;height:34px;background:url('./Tezo.svg') center/contain no-repeat}
+.mk-nav{display:flex;gap:26px;color:#e7e9f2;font-size:15px;font-weight:600}
+.mk-nav a{cursor:default}
+.mk-talk{background:var(--tz-pink);color:#fff;font-weight:700;font-size:14px;padding:11px 20px;border-radius:9px}
+@media(max-width:760px){.mk-nav{display:none}}
+
+/* ============================================================
+   COMPONENT 1 — TOP ANNOUNCEMENT STRIP  (drop-in)
+   Replace the current "Manufacturing workflow automation" strip.
+   Self-contained; all classes prefixed .tzar-strip*
+   ============================================================ */
+.tzar-strip{display:block;width:100%;text-decoration:none;background:var(--tz-pink);
+  font-family:'Inter',system-ui,sans-serif;transition:background .15s}
+.tzar-strip:hover{background:#d4164f}
+.tzar-strip .in{max-width:1280px;margin:0 auto;padding:11px 20px;display:flex;align-items:center;justify-content:center;gap:12px;flex-wrap:wrap;text-align:center}
+.tzar-strip .tag{font-size:10.5px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:var(--tz-pink);background:#fff;border-radius:99px;padding:3px 9px}
+.tzar-strip .txt{color:#fff;font-size:14px;font-weight:600;letter-spacing:.005em}
+.tzar-strip .txt b{font-weight:800}
+.tzar-strip .go{color:#fff;font-size:13.5px;font-weight:800;display:inline-flex;align-items:center;gap:5px;white-space:nowrap}
+.tzar-strip .go .ar{transition:transform .15s}
+.tzar-strip:hover .go .ar{transform:translateX(4px)}
+
+/* ============================================================
+   COMPONENT 2 — DATA-LAYER DROPDOWN PROMO  (drop-in)
+   Place after the 3 Data sub-sections in the mega-menu right column.
+   Classes prefixed .tzar-promo*
+   ============================================================ */
+.tzar-promo{display:flex;align-items:center;gap:20px;text-decoration:none;
+  font-family:'Inter',system-ui,sans-serif;
+  background:linear-gradient(120deg,rgba(236,27,91,.16),rgba(236,27,91,.04) 60%,transparent);
+  border:1px solid rgba(236,27,91,.40);border-radius:16px;padding:18px 20px;margin-top:14px;
+  position:relative;overflow:hidden;transition:border-color .16s,transform .16s}
+.tzar-promo:hover{border-color:var(--tz-pink);transform:translateY(-2px)}
+.tzar-promo .ring{flex:0 0 auto}
+.tzar-promo .body{flex:1;min-width:0}
+.tzar-promo .eyebrow{font-size:10.5px;font-weight:800;letter-spacing:.1em;text-transform:uppercase;color:var(--tz-pink-2);margin-bottom:5px}
+.tzar-promo h4{margin:0 0 4px;font-size:17px;font-weight:800;color:#fff;letter-spacing:-.01em}
+.tzar-promo p{margin:0;font-size:12.5px;color:var(--ink2);line-height:1.5}
+.tzar-promo .cta{flex:0 0 auto;background:var(--tz-pink);color:#fff;font-weight:700;font-size:13px;padding:11px 16px;border-radius:10px;display:inline-flex;align-items:center;gap:7px;white-space:nowrap}
+.tzar-promo:hover .cta{background:#ff2e6b}
+@media(max-width:640px){.tzar-promo{flex-wrap:wrap}.tzar-promo .cta{width:100%;justify-content:center}}
+
+/* ============================================================
+   COMPONENT 3 — EXIT-INTENT POPUP (Data page)  (drop-in)
+   Classes prefixed .tzar-exit*  ·  JS at bottom of file (IIFE)
+   ============================================================ */
+.tzar-exit{position:fixed;inset:0;z-index:9999;display:none;align-items:center;justify-content:center;padding:20px;
+  background:rgba(0,0,0,.74);backdrop-filter:blur(6px);font-family:'Inter',system-ui,sans-serif}
+.tzar-exit.open{display:flex;animation:tzarFade .22s ease}
+@keyframes tzarFade{from{opacity:0}to{opacity:1}}
+.tzar-exit .card{position:relative;width:100%;max-width:520px;background:#0b0b0b;border:1px solid rgba(255,255,255,.16);
+  border-radius:22px;padding:40px 38px 32px;box-shadow:0 40px 90px rgba(0,0,0,.6);text-align:center;
+  background-image:radial-gradient(520px 280px at 90% -10%,rgba(236,27,91,.22),transparent 60%)}
+.tzar-exit .x{position:absolute;right:16px;top:16px;width:34px;height:34px;border-radius:50%;border:1px solid rgba(255,255,255,.18);
+  background:rgba(255,255,255,.05);color:#c9cee0;font-size:17px;cursor:pointer;line-height:1}
+.tzar-exit .x:hover{background:rgba(236,27,91,.14);color:#fff;border-color:var(--tz-pink)}
+.tzar-exit .ring{margin:0 auto 18px}
+.tzar-exit .over{font-size:11.5px;font-weight:800;letter-spacing:.12em;text-transform:uppercase;color:var(--tz-pink-2)}
+.tzar-exit h3{font-size:25px;font-weight:800;letter-spacing:-.02em;margin:10px auto 0;max-width:17ch;line-height:1.12;color:#fff}
+.tzar-exit p{font-size:14.5px;color:var(--ink2);margin:12px auto 0;max-width:42ch;line-height:1.6}
+.tzar-exit .acts{display:flex;flex-direction:column;gap:10px;margin-top:24px}
+.tzar-exit .primary{background:var(--tz-pink);color:#fff;font-weight:700;font-size:15px;padding:14px 22px;border-radius:12px;text-decoration:none;display:inline-flex;align-items:center;justify-content:center;gap:8px}
+.tzar-exit .primary:hover{background:#ff2e6b}
+.tzar-exit .later{background:none;border:none;color:var(--muted);font-size:13px;font-weight:600;cursor:pointer;padding:6px}
+.tzar-exit .later:hover{color:#fff}
+.tzar-exit .fine{font-size:11.5px;color:var(--muted);margin-top:14px}
+
+/* preview helper button */
+.pv-btn{background:#161616;border:1px solid var(--border2);color:#fff;font-family:inherit;font-weight:700;font-size:13px;padding:11px 18px;border-radius:10px;cursor:pointer;margin-top:16px}
+.pv-btn:hover{border-color:var(--tz-pink);background:var(--tz-soft)}
+
+/* ===== Mega-menu mock (preview context only) ===== */
+.mm{background:#0a0a0a;border:1px solid rgba(255,255,255,.10);border-radius:16px;margin:18px;padding:22px;display:grid;grid-template-columns:300px 1fr;gap:18px}
+.mm-left{display:flex;flex-direction:column;gap:6px}
+.mm-li{padding:14px 16px;border-radius:12px}
+.mm-li.active{background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.10)}
+.mm-li h5{margin:0 0 3px;font-size:15px;font-weight:700;color:#fff}
+.mm-li span{font-size:12px;color:var(--muted)}
+.mm-right{display:flex;flex-direction:column;gap:12px}
+.mm-card{display:flex;gap:14px;align-items:flex-start;border:1px solid rgba(255,255,255,.08);border-radius:14px;padding:16px 18px}
+.mm-card .mi{width:34px;height:34px;border-radius:9px;background:rgba(255,255,255,.05);display:flex;align-items:center;justify-content:center;color:var(--tz-pink-2);flex-shrink:0}
+.mm-card h6{margin:0 0 3px;font-size:14.5px;font-weight:700;color:#fff}
+.mm-card p{margin:0;font-size:12.5px;color:var(--muted);line-height:1.5}
+@media(max-width:760px){.mm{grid-template-columns:1fr}}
+
+/* Mock data-page hero (preview context only) */
+.dp{padding:70px 40px 90px;background:radial-gradient(900px 500px at 80% 0%,rgba(40,40,80,.5),transparent 60%),#000}
+.dp h2{font-size:clamp(34px,5vw,56px);font-weight:800;letter-spacing:-.03em;margin:0;line-height:1.05}
+.dp p{color:var(--ink2);font-size:16px;max-width:60ch;margin:18px 0 0;line-height:1.6}
+</style>
+</head>
+<body>
+
+<div class="pv-note">
+  <h1>AI Readiness Advisor — 3 site placements (preview)</h1>
+  <p>Each component below is brand-matched and self-contained. In the source, every component is wrapped in clearly marked <code>COMPONENT 1/2/3</code> comments with its own prefixed CSS (<code>.tzar-strip</code>, <code>.tzar-promo</code>, <code>.tzar-exit</code>) so your team can lift it straight into the live site. All CTAs point to <code>https://www.tezo.com/ai-readiness-advisor</code>.</p>
+</div>
+
+<!-- ====================== PLACEMENT 1 ====================== -->
+<div class="pv-block">
+  <div class="pv-label"><b>1</b> Announcement strip (above header)</div>
+  <div class="pv-frame">
+
+    <!-- ===== COMPONENT 1: TOP STRIP — drop-in starts ===== -->
+    <a class="tzar-strip" href="https://www.tezo.com/ai-readiness-advisor">
+      <span class="in">
+        <span class="tag">Free · 2 min</span>
+        <span class="txt">Is your data actually <b>AI-ready</b>? Get your score before you build.</span>
+        <span class="go">Take the assessment <span class="ar">→</span></span>
+      </span>
+    </a>
+    <!-- ===== COMPONENT 1: TOP STRIP — drop-in ends ===== -->
+
+    <header class="mk-hdr">
+      <div class="mk-logo"><span class="mk-mark"></span> tezo</div>
+      <nav class="mk-nav"><a>Services ▾</a><a>Solutions</a><a>Labs</a><a>About ▾</a><a>Careers</a></nav>
+      <a class="mk-talk">Talk to us</a>
+    </header>
+  </div>
+  <div class="pv-cap">Sits where the current "Automating complex manufacturing workflows…" strip is. Full bar is clickable.</div>
+</div>
+
+<div class="pv-sep"></div>
+
+<!-- ====================== PLACEMENT 2 ====================== -->
+<div class="pv-block">
+  <div class="pv-label"><b>2</b> Promo box inside the Data-layer dropdown</div>
+  <div class="pv-frame">
+    <header class="mk-hdr">
+      <div class="mk-logo"><span class="mk-mark"></span> tezo</div>
+      <nav class="mk-nav"><a style="color:#fff">Services ▴</a><a>Solutions</a><a>Labs</a><a>About ▾</a><a>Careers</a></nav>
+      <a class="mk-talk">Talk to us</a>
+    </header>
+
+    <div class="mm">
+      <div class="mm-left">
+        <div class="mm-li"><h5>AI: The Thinking Layer</h5><span>Strategic intelligence that guides decisions</span></div>
+        <div class="mm-li active"><h5>Data: The Enabling Layer ›</h5><span>Trusted data, ready for AI</span></div>
+        <div class="mm-li"><h5>Digital: The Execution Layer</h5><span>Build, ship, and scale</span></div>
+      </div>
+      <div class="mm-right">
+        <div class="mm-card"><div class="mi">◧</div><div><h6>Data Modernization &amp; Engineering</h6><p>Cloud-native pipelines that unlock real-time, reliable data at enterprise scale.</p></div></div>
+        <div class="mm-card"><div class="mi">▤</div><div><h6>Data &amp; Operations at Scale</h6><p>Secure, compliant, scalable systems that enable smarter, data-driven priorities.</p></div></div>
+        <div class="mm-card"><div class="mi">➶</div><div><h6>Analytics &amp; Intelligence</h6><p>Self-serve dashboards and ML-powered insights for sharper, faster decisions.</p></div></div>
+
+        <!-- ===== COMPONENT 2: DROPDOWN PROMO — drop-in starts ===== -->
+        <a class="tzar-promo" href="https://www.tezo.com/ai-readiness-advisor">
+          <span class="ring">
+            <svg width="62" height="62" viewBox="0 0 62 62" fill="none" aria-hidden="true">
+              <circle cx="31" cy="31" r="26" stroke="rgba(255,255,255,.12)" stroke-width="6"/>
+              <circle cx="31" cy="31" r="26" stroke="#EC1B5B" stroke-width="6" stroke-linecap="round"
+                      stroke-dasharray="163" stroke-dashoffset="58" transform="rotate(-90 31 31)"/>
+              <text x="31" y="29" text-anchor="middle" fill="#fff" font-size="15" font-weight="800" font-family="Inter,sans-serif">2</text>
+              <text x="31" y="41" text-anchor="middle" fill="#9aa0b8" font-size="8.5" font-weight="700" font-family="Inter,sans-serif">MIN</text>
+            </svg>
+          </span>
+          <span class="body">
+            <span class="eyebrow">Free tool · New</span>
+            <h4>Is your data AI-ready?</h4>
+            <p>Benchmark your data against AI-ready standards and get an instant score + roadmap.</p>
+          </span>
+          <span class="cta">Get your score →</span>
+        </a>
+        <!-- ===== COMPONENT 2: DROPDOWN PROMO — drop-in ends ===== -->
+      </div>
+    </div>
+  </div>
+  <div class="pv-cap">Appears right after the three Data sub-sections, as an ad-style banner inside the mega-menu.</div>
+</div>
+
+<div class="pv-sep"></div>
+
+<!-- ====================== PLACEMENT 3 ====================== -->
+<div class="pv-block">
+  <div class="pv-label"><b>3</b> Exit-intent pop-up (Data page)</div>
+  <div class="pv-frame">
+    <header class="mk-hdr">
+      <div class="mk-logo"><span class="mk-mark"></span> tezo</div>
+      <nav class="mk-nav"><a>Services ▾</a><a>Solutions</a><a>Labs</a><a>About ▾</a><a>Careers</a></nav>
+      <a class="mk-talk">Talk to us</a>
+    </header>
+    <div class="dp">
+      <h2>Modernize what matters.<br>Activate what's next.</h2>
+      <p>From infrastructure to insights, Tezo helps you turn fragmented systems into intelligence engines that support faster decisions, scalable automation, and responsible AI.</p>
+      <button class="pv-btn" id="pvExitDemo" type="button">▶ Preview the exit pop-up</button>
+    </div>
+  </div>
+  <div class="pv-cap">Fires once per session when the visitor moves to leave the Data page (cursor toward the tab/close). Use the button to preview; on the live site it triggers automatically.</div>
+</div>
+
+<!-- ===== COMPONENT 3: EXIT-INTENT POPUP — drop-in starts ===== -->
+<div class="tzar-exit" id="tzarExit" role="dialog" aria-modal="true" aria-labelledby="tzarExitTitle">
+  <div class="card">
+    <button class="x" id="tzarExitClose" type="button" aria-label="Close">✕</button>
+    <div class="ring">
+      <svg width="76" height="76" viewBox="0 0 76 76" fill="none" aria-hidden="true">
+        <circle cx="38" cy="38" r="31" stroke="rgba(255,255,255,.12)" stroke-width="7"/>
+        <circle cx="38" cy="38" r="31" stroke="#EC1B5B" stroke-width="7" stroke-linecap="round"
+                stroke-dasharray="195" stroke-dashoffset="70" transform="rotate(-90 38 38)"/>
+        <text x="38" y="36" text-anchor="middle" fill="#fff" font-size="20" font-weight="800" font-family="Inter,sans-serif">?</text>
+        <text x="38" y="50" text-anchor="middle" fill="#9aa0b8" font-size="9" font-weight="700" font-family="Inter,sans-serif">SCORE</text>
+      </svg>
+    </div>
+    <div class="over">Before you go —</div>
+    <h3 id="tzarExitTitle">Don't guess if your data is AI-ready. Know.</h3>
+    <p>Take the free 2-minute AI Readiness Assessment. Get an instant score, an industry benchmark, and a downloadable roadmap — no sales call required.</p>
+    <div class="acts">
+      <a class="primary" href="https://www.tezo.com/ai-readiness-advisor">Take the free assessment →</a>
+      <button class="later" id="tzarExitLater" type="button">Maybe later</button>
+    </div>
+    <div class="fine">Free · 12 questions · ~1 minute · instant PDF</div>
+  </div>
+</div>
+<script>
+(function(){
+  var modal = document.getElementById("tzarExit");
+  if(!modal) return;
+  var KEY = "tzar_exit_seen";
+  function open(){ modal.classList.add("open"); document.body.style.overflow="hidden"; }
+  function close(){ modal.classList.remove("open"); document.body.style.overflow=""; try{ sessionStorage.setItem(KEY,"1"); }catch(e){} }
+  document.getElementById("tzarExitClose").addEventListener("click", close);
+  document.getElementById("tzarExitLater").addEventListener("click", close);
+  modal.addEventListener("click", function(e){ if(e.target===modal) close(); });
+  document.addEventListener("keydown", function(e){ if(e.key==="Escape" && modal.classList.contains("open")) close(); });
+  // Exit intent: cursor leaves through the top of the viewport, once per session
+  document.addEventListener("mouseout", function(e){
+    if(e.clientY<=0 && !e.relatedTarget && !e.toElement){
+      var seen=false; try{ seen=sessionStorage.getItem(KEY)==="1"; }catch(err){}
+      if(!seen) open();
+    }
+  });
+  // Preview trigger (remove on live site)
+  var demo=document.getElementById("pvExitDemo");
+  if(demo) demo.addEventListener("click", open);
+})();
+</script>
+<!-- ===== COMPONENT 3: EXIT-INTENT POPUP — drop-in ends ===== -->
+
+</body>
+</html>
